@@ -39,7 +39,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "uart_term.h"
+#include <uart_term.h>
 
 extern int vsnprintf(char * s,
                      size_t n,

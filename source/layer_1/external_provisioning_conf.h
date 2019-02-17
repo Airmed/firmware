@@ -30,6 +30,8 @@
  * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+#include <stdint.h>
+
 void StartExternalProvisioning();
 void StopExternalProvisioning();
 uint8_t IsActiveExternalConfirmation();

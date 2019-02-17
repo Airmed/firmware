@@ -15,4 +15,5 @@
 	<templateProperties value="id=provisioning_CC3220S_LAUNCHXL_tirtos_gcc.projectspec.provisioning_CC3220S_LAUNCHXL_tirtos_gcc,buildProfile=release,isHybrid=true"/>
 	<origin value="C:\ti\simplelink_cc32xx_sdk_2_40_01_01\examples\rtos\CC3220S_LAUNCHXL\demos\provisioning\tirtos\gcc\provisioning_CC3220S_LAUNCHXL_tirtos_gcc.projectspec"/>
 	<filesToOpen value=""/>
+	<isTargetManual value="false"/>
 </projectOptions>

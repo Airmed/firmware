@@ -51,6 +51,7 @@
 //****************************************************************************
 
 /* Standard Include */
+#include <external_provisioning_conf.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
@@ -59,13 +60,11 @@
 #include <ti/drivers/net/wifi/simplelink.h>
 #include <ti/drivers/SPI.h>
 #include <ti/drivers/GPIO.h>
-#include <uart_term.h>
-
 #include <pthread.h>
 #include <unistd.h>
 #include "mqueue.h"
 #include <time.h>
-#include "external_provisioning_conf.h"
+#include <uart_term.h>
 
 /* Application Version and Naming*/
 #define APPLICATION_NAME         "PROVISIONING"
