@@ -48,7 +48,8 @@
 /* Example/Board Header files */
 #include "Board.h"
 
-extern void * mainThread(void *arg0);
+extern void * provisioning_thread(void * arg0);
+extern void * application_thread(void * arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    4096
@@ -94,7 +95,7 @@ int main(void)
         }
     }
 
-    retc = pthread_create(&thread, &pAttrs, mainThread, NULL);
+    retc = pthread_create(&thread, &pAttrs, provisioning_thread, NULL);
     if(retc != 0)
     {
         /* pthread_create() failed */

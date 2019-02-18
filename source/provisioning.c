@@ -1845,7 +1845,7 @@ static void DisplayBanner(char * AppName)
 //! \return none
 //!
 //*****************************************************************************
-void * mainThread( void *arg )
+void * provisioning_thread( void *arg )
 {
     uint32_t             RetVal;
     pthread_attr_t      pAttrs;
