@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>apotech_s</name>
+	<name>apotech</name>
 	<comment></comment>
 	<projects>
-		<project>ti_rtos_s</project>
+		<project>ti_rtos_sf</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -29,12 +29,18 @@
 		<link>
 			<name>Board.html</name>
 			<type>1</type>
-			<locationURI>COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR/source/ti/boards/CC3220S_LAUNCHXL/Board.html</locationURI>
+			<locationURI>COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR/source/ti/boards/CC3220SF_LAUNCHXL/Board.html</locationURI>
 		</link>
 		<link>
 			<name>source</name>
 			<type>2</type>
-			<locationURI>PARENT-1-PROJECT_LOC/source</locationURI>
+			<locationURI>copy_PARENT/source</locationURI>
 		</link>
 	</linkedResources>
+	<variableList>
+		<variable>
+			<name>copy_PARENT</name>
+			<value>$%7BPARENT-1-TI_PRODUCTS_DIR%7D/files/school/airmed-fw</value>
+		</variable>
+	</variableList>
 </projectDescription>
