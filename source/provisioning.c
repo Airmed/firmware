@@ -828,9 +828,8 @@ void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer)
 //*****************************************************************************
 void FactoryIndicationLed(void)
 {
-    GPIO_write(Board_GPIO_LED2, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED1, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_ON);
+    GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
+    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
     gLedState = 0;
 
     while(1)
@@ -842,14 +841,14 @@ void FactoryIndicationLed(void)
         {
             if(gLedState)
             {
-                GPIO_write(Board_GPIO_LED1, Board_GPIO_LED_OFF);
-                GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_ON);
+                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
+                GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
                 gLedState = 0;
             }
             else
             {
-                GPIO_write(Board_GPIO_LED1, Board_GPIO_LED_ON);
-                GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_OFF);
+                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_ON);
+                GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
                 gLedState = 1;
             }
         }
@@ -867,9 +866,7 @@ void FactoryIndicationLed(void)
 //*****************************************************************************
 void ErrorLedDisplay(void)
 {
-    GPIO_write(Board_GPIO_LED2, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED1, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_OFF);
+    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
     gErrLedState = 0;
 
     while(1)
@@ -881,12 +878,12 @@ void ErrorLedDisplay(void)
         {
             if(gErrLedState)
             {
-                GPIO_write(Board_GPIO_LED2, Board_GPIO_LED_OFF);
+                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
                 gErrLedState = 0;
             }
             else
             {
-                GPIO_write(Board_GPIO_LED2, Board_GPIO_LED_ON);
+                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_ON);
                 gErrLedState = 1;
             }
         }
@@ -920,7 +917,7 @@ void * UpdateLedDisplay(void *arg)
             {
                 if(0 == gLedState)
                 {
-                    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_ON);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
                     gLedState = 1;
                 }
             }
@@ -928,12 +925,12 @@ void * UpdateLedDisplay(void *arg)
             {
                 if(gLedState)
                 {
-                    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_OFF);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
                     gLedState = 0;
                 }
                 else
                 {
-                    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_ON);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
                     gLedState = 1;
                 }
             }
@@ -1861,9 +1858,8 @@ void * provisioning_thread( void *arg )
     DisplayBanner(APPLICATION_NAME);
 
     /* Switch off all LEDs on boards */
-    GPIO_write(Board_GPIO_LED0, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED1, Board_GPIO_LED_OFF);
-    GPIO_write(Board_GPIO_LED2, Board_GPIO_LED_OFF);
+    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
+    GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
 
     /* create the sl_Task */
     pthread_attr_init(&pAttrs_spawn);

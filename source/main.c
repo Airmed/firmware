@@ -46,7 +46,7 @@
 #include <ti/drivers/GPIO.h>
 
 /* Example/Board Header files */
-#include "Board.h"
+#include "board.h"
 
 extern void * provisioning_thread(void * arg0);
 extern void * application_thread(void * arg0);

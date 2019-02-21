@@ -27,11 +27,6 @@
 	</natures>
 	<linkedResources>
 		<link>
-			<name>Board.html</name>
-			<type>1</type>
-			<locationURI>COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR/source/ti/boards/CC3220SF_LAUNCHXL/Board.html</locationURI>
-		</link>
-		<link>
 			<name>source</name>
 			<type>2</type>
 			<locationURI>copy_PARENT/source</locationURI>
