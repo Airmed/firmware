@@ -1,8 +1,8 @@
 
 #include "shutter.h"
 
-#include "gpio.h"
 #include "pin_map.h"
+#include "sensor.h"
 #include "stepper.h"
 
 #include "board.h"

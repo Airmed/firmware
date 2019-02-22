@@ -18,11 +18,6 @@ void buttons_init()
 
 }
 
-void sensor_init()
-{
-
-}
-
 void led_status_off()
 {
     GPIO_write(BOARD_GPIO_LED_STATUS, BOARD_PIN_OFF);
@@ -49,11 +44,6 @@ bool button_patient_get_status()
 }
 
 bool button_reset_get_status()
-{
-
-}
-
-bool sensor_get_status()
 {
 
 }
