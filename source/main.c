@@ -66,7 +66,7 @@ int main(void)
     int detachState;
 
     /* Call board init functions */
-    Board_initGeneral();
+    board_init();
 
     /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);

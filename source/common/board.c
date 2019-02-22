@@ -22,7 +22,7 @@
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC32XX.h>
 
-#include "Board.h"
+#include "board.h"
 #include "pin_map.h"
 
 /*
@@ -158,7 +158,7 @@ const UDMACC32XX_Config UDMACC32XX_config = {
 /*
  *  ======== CC3220S_LAUNCHXL_initGeneral ========
  */
-void CC3220S_LAUNCHXL_initGeneral(void)
+void board_init(void)
 {
     PRCMCC3200MCUInit();
     Power_init();

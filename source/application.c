@@ -10,6 +10,8 @@ void hardware_init();
 void * application_thread(void * arg0)
 {
     hardware_init();
+
+    return 0;
 }
 
 void hardware_init()
@@ -19,6 +21,7 @@ void hardware_init()
 
     buzzer_init();
     flash_init();
+    shutter_init();
 
     leds_init();
     buttons_init();

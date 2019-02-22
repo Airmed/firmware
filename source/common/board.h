@@ -4,9 +4,6 @@
 
 /* original board.h */
 
-#define Board_init                   CC3220S_LAUNCHXL_initGeneral
-#define Board_initGeneral            CC3220S_LAUNCHXL_initGeneral
-
 /* These #defines allow us to reuse TI-RTOS across other device families */
 
 #define Board_ADC0                   CC3220S_LAUNCHXL_ADC0
@@ -19,6 +16,9 @@
 
 #define Board_GPIO_LED_ON            CC3220S_LAUNCHXL_GPIO_LED_ON
 #define Board_GPIO_LED_OFF           CC3220S_LAUNCHXL_GPIO_LED_OFF
+
+#define BOARD_PIN_OFF (0)
+#define BOARD_PIN_ON (1)
 /*
  *  CC3220S_LAUNCHXL_GPIO_LED_D8 and CC3220S_LAUNCHXL_GPIO_LED_D9 are shared with the I2C
  *  and PWM peripherals. In order for those examples to work, these LEDs are
@@ -99,11 +99,8 @@ typedef enum CC3220S_LAUNCHXL_CryptoName {
     CC3220S_LAUNCHXL_CRYPTOCOUNT
 } CC3220S_LAUNCHXL_CryptoName;
 
-/*!
- *  @def    CC3220S_LAUNCHXL_GPIOName
- *  @brief  Enum of GPIO names on the CC3220S_LAUNCHXL dev board
- */
-typedef enum CC3220S_LAUNCHXL_GPIOName {
+typedef enum
+{
     /* pins with callbacks first */
     BOARD_GPIO_BUTTON_PATIENT = 0,
 
@@ -124,7 +121,7 @@ typedef enum CC3220S_LAUNCHXL_GPIOName {
     BOARD_DRUM_COIL0_N,
     BOARD_DRUM_COIL1_P,
     BOARD_DRUM_COIL1_N
-} CC3220S_LAUNCHXL_GPIOName;
+} board_gpio_name;
 
 /*!
  *  @def    CC3220S_LAUNCHXL_I2CName
@@ -226,6 +223,6 @@ typedef enum CC3220S_LAUNCHXL_WatchdogName {
  *
  *  This function initializes the general board specific settings.
  */
-extern void CC3220S_LAUNCHXL_initGeneral(void);
+extern void board_init(void);
 
 #endif
