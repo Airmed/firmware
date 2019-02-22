@@ -4,7 +4,7 @@
 #include "pin_map.h"
 #include "pwm.h"
 
-#include <ti/drivers/gpio.h>
+#include <ti/drivers/GPIO.h>
 
 #include "board.h"
 

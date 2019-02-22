@@ -6,7 +6,7 @@
 #include "stepper.h"
 
 #include "board.h"
-#include "ti/drivers/gpio.h"
+#include "ti/drivers/GPIO.h"
 
 stepper_t shutter;
 
