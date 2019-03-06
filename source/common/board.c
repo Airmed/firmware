@@ -40,31 +40,23 @@
 #include <ti/drivers/ADC.h>
 #include <ti/drivers/adc/ADCCC32XX.h>
 
-ADCCC32XX_Object adcCC3220SObjects[CC3220S_LAUNCHXL_ADCCOUNT];
+ADCCC32XX_Object adcCC3220SObjects[BOARD_ADC_COUNT];
 
-const ADCCC32XX_HWAttrsV1 adcCC3220SHWAttrs[CC3220S_LAUNCHXL_ADCCOUNT] = {
+const ADCCC32XX_HWAttrsV1 adcCC3220SHWAttrs[BOARD_ADC_COUNT] = {
     {
-        .adcPin = ADCCC32XX_PIN_59_CH_2
-    },
-    {
-        .adcPin = ADCCC32XX_PIN_60_CH_3
+        .adcPin = BOARD_SENSOR_ADC_PIN
     }
 };
 
-const ADC_Config ADC_config[CC3220S_LAUNCHXL_ADCCOUNT] = {
+const ADC_Config ADC_config[BOARD_ADC_COUNT] = {
     {
         .fxnTablePtr = &ADCCC32XX_fxnTable,
-        .object = &adcCC3220SObjects[CC3220S_LAUNCHXL_ADC0],
-        .hwAttrs = &adcCC3220SHWAttrs[CC3220S_LAUNCHXL_ADC0]
-    },
-    {
-        .fxnTablePtr = &ADCCC32XX_fxnTable,
-        .object = &adcCC3220SObjects[CC3220S_LAUNCHXL_ADC1],
-        .hwAttrs = &adcCC3220SHWAttrs[CC3220S_LAUNCHXL_ADC1]
+        .object = &adcCC3220SObjects[BOARD_SENSOR_ADC],
+        .hwAttrs = &adcCC3220SHWAttrs[BOARD_SENSOR_ADC]
     }
 };
 
-const uint_least8_t ADC_count = CC3220S_LAUNCHXL_ADCCOUNT;
+const uint_least8_t ADC_count = BOARD_ADC_COUNT;
 
 /*
  *  =============================== Capture ===============================

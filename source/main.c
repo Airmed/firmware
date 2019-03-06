@@ -59,7 +59,7 @@ extern void * application_thread(void * arg0);
  */
 int main(void)
 {
-    pthread_t thread;
+    pthread_t provisioning, application;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
     int retc;
@@ -77,10 +77,7 @@ int main(void)
     if(retc != 0)
     {
         /* pthread_attr_setdetachstate() failed */
-        while(1)
-        {
-            ;
-        }
+        while(1);
     }
 
     pthread_attr_setschedparam(&pAttrs, &priParam);
@@ -89,20 +86,21 @@ int main(void)
     if(retc != 0)
     {
         /* pthread_attr_setstacksize() failed */
-        while(1)
-        {
-            ;
-        }
+        while(1);
     }
 
-    retc = pthread_create(&thread, &pAttrs, provisioning_thread, NULL);
+    retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
     if(retc != 0)
     {
         /* pthread_create() failed */
-        while(1)
-        {
-            ;
-        }
+        while(1);
+    }
+
+    retc = pthread_create(&application, &pAttrs, application_thread, NULL);
+    if(retc != 0)
+    {
+        /* pthread_create() failed */
+        while(1);
     }
 
     BIOS_start();

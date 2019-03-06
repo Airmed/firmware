@@ -1,6 +1,6 @@
 
-#ifndef __GPIO_H__
-#define __GPIO_H__
+#ifndef __SENSOR_H__
+#define __SENSOR_H__
 
 #include <stdbool.h>
 

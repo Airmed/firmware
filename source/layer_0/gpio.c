@@ -40,10 +40,11 @@ void led_error_on()
 
 bool button_patient_get_status()
 {
-
+    bool temp = GPIO_read(BOARD_GPIO_BUTTON_PATIENT);
+    return temp;
 }
 
 bool button_reset_get_status()
 {
-
+    return GPIO_read(BOARD_GPIO_BUTTON_RESET);
 }

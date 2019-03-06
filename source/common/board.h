@@ -71,12 +71,11 @@
  *  @def    CC3220S_LAUNCHXL_ADCName
  *  @brief  Enum of ADC names on the CC3220S_LAUNCHXL dev board
  */
-typedef enum CC3220S_LAUNCHXL_ADCName {
-    CC3220S_LAUNCHXL_ADC0 = 0,
-    CC3220S_LAUNCHXL_ADC1,
+typedef enum {
+    BOARD_SENSOR_ADC = 0,
 
-    CC3220S_LAUNCHXL_ADCCOUNT
-} CC3220S_LAUNCHXL_ADCName;
+    BOARD_ADC_COUNT
+} board_adc_name;
 
 /*!
  *  @def    CC3220S_LAUNCHXL_CaptureName
