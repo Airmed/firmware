@@ -4,6 +4,7 @@
 	<comment></comment>
 	<projects>
 		<project>ti_rtos_sf</project>
+		<project>ti_rtos_s</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -25,13 +26,6 @@
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>source</name>
-			<type>2</type>
-			<locationURI>copy_PARENT/source</locationURI>
-		</link>
-	</linkedResources>
 	<variableList>
 		<variable>
 			<name>copy_PARENT</name>
