@@ -22,6 +22,11 @@ void stepper_init(stepper_t * stepper)
     clock_params.arg = (xdc_UArg)stepper;
     stepper->timer = Clock_create(stepper_handler, 100, &clock_params, Error_IGNORE);
 
+    GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
+    GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
+    GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
+    GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+
     stepper_disable(stepper);
 }
 
