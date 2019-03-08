@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <projectDescription>
-	<name>apotech</name>
+	<name>ti_rtos</name>
 	<comment></comment>
 	<projects>
-		<project>ti_rtos</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
@@ -19,16 +18,11 @@
 		</buildCommand>
 	</buildSpec>
 	<natures>
+		<nature>org.eclipse.rtsc.xdctools.buildDefinitions.XDC.xdcNature</nature>
 		<nature>com.ti.ccstudio.core.ccsNature</nature>
 		<nature>org.eclipse.cdt.core.cnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.managedBuildNature</nature>
 		<nature>org.eclipse.cdt.core.ccnature</nature>
 		<nature>org.eclipse.cdt.managedbuilder.core.ScannerConfigNature</nature>
 	</natures>
-	<variableList>
-		<variable>
-			<name>copy_PARENT</name>
-			<value>$%7BPARENT-1-TI_PRODUCTS_DIR%7D/files/school/airmed-fw</value>
-		</variable>
-	</variableList>
 </projectDescription>
