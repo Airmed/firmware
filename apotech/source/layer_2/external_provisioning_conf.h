@@ -34,4 +34,4 @@
 
 void StartExternalProvisioning();
 void StopExternalProvisioning();
-uint8_t IsActiveExternalConfirmation();
+uint8_t IsActiveExternalConfiguration();
