@@ -17,5 +17,5 @@ void flash_write(uint32_t addr, uint8_t data)
 
 uint8_t flash_read(uint32_t addr)
 {
-
+    return 0;
 }

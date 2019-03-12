@@ -15,8 +15,6 @@ void hardware_init();
 
 void * application_thread(void * arg0)
 {
-    bool val;
-
     hardware_init();
 
     while (true)
