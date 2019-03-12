@@ -50,6 +50,8 @@
 
 extern void * provisioning_thread(void * arg0);
 extern void * application_thread(void * arg0);
+extern void * it_02_thread(void * arg0);
+extern void * it_03_thread(void * arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    4096
@@ -74,34 +76,26 @@ int main(void)
 
     detachState = PTHREAD_CREATE_DETACHED;
     retc = pthread_attr_setdetachstate(&pAttrs, detachState);
-    if(retc != 0)
-    {
-        /* pthread_attr_setdetachstate() failed */
-        while(1);
-    }
+    if(retc != 0) while(1);
 
     pthread_attr_setschedparam(&pAttrs, &priParam);
 
     retc |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
-    if(retc != 0)
-    {
-        /* pthread_attr_setstacksize() failed */
-        while(1);
-    }
+    if(retc != 0) while(1);
 
     retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
-    if(retc != 0)
-    {
-        /* pthread_create() failed */
-        while(1);
-    }
+    if(retc != 0) while(1);
 
+#if !defined(IT_02) && !defined(IT_03)
     retc = pthread_create(&application, &pAttrs, application_thread, NULL);
-    if(retc != 0)
-    {
-        /* pthread_create() failed */
-        while(1);
-    }
+    if(retc != 0) while(1);
+#elif  defined(IT_02)
+    retc = pthread_create(&application, &pAttrs, it_02_thread, NULL);
+    if(retc != 0) while(1);
+#elif defined(IT_03)
+    retc = pthread_create(&application, &pAttrs, it_03_thread, NULL);
+    if(retc != 0) while(1);
+#endif
 
     BIOS_start();
 

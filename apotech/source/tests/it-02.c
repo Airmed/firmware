@@ -4,7 +4,7 @@
 
 extern void hardware_init();
 
-int main(void)
+void * it_02_thread(void * arg0)
 {
     hardware_init();
 
