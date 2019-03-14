@@ -86,6 +86,8 @@ int main(void)
     retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
     if(retc != 0) while(1);
 
+    GPIO_init();
+
 #if !defined(IT_02) && !defined(IT_03)
     retc = pthread_create(&application, &pAttrs, application_thread, NULL);
     if(retc != 0) while(1);

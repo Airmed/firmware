@@ -47,29 +47,29 @@ void stepper_increment_position(stepper_t * stepper)
         case STEPPER_STATE_A:
             GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
             GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
             stepper->state = STEPPER_STATE_B;
             break;
         case STEPPER_STATE_B:
             GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
             GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
             stepper->state = STEPPER_STATE_C;
             break;
         case STEPPER_STATE_C:
             GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
             GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
             stepper->state = STEPPER_STATE_D;
             break;
         case STEPPER_STATE_D:
             GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
             GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
             stepper->state = STEPPER_STATE_A;
             break;
     }
@@ -84,29 +84,29 @@ void stepper_decrement_position(stepper_t * stepper)
         case STEPPER_STATE_A:
             GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
             GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
             stepper->state = STEPPER_STATE_D;
             break;
         case STEPPER_STATE_B:
             GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
             GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
             stepper->state = STEPPER_STATE_A;
             break;
         case STEPPER_STATE_C:
             GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
             GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
             stepper->state = STEPPER_STATE_B;
             break;
         case STEPPER_STATE_D:
             GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
             GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
+            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
             stepper->state = STEPPER_STATE_C;
             break;
     }

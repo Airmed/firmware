@@ -403,8 +403,8 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP.356727728" name="C++ Language standard (-std)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP" useByScannerDiscovery="false" value="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP.CPP11" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE.801721887" name="Define symbols (-D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="${INHERITED_SYMBOLS}"/>
-									<listOptionValue builtIn="false" value="BOARD_PROD"/>
 									<listOptionValue builtIn="false" value="IT_02"/>
+									<listOptionValue builtIn="false" value="BOARD_LAUNCH_SF"/>
 								</option>
 								<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__C_SRCS.1237410979" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__C_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__CPP_SRCS.1504923146" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__CPP_SRCS"/>
@@ -520,8 +520,8 @@
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP.783516738" name="C++ Language standard (-std)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP" useByScannerDiscovery="false" value="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.STD_CPP.CPP11" valueType="enumerated"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE.1664221943" name="Define symbols (-D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="${INHERITED_SYMBOLS}"/>
-									<listOptionValue builtIn="false" value="BOARD_PROD"/>
 									<listOptionValue builtIn="false" value="IT_03"/>
+									<listOptionValue builtIn="false" value="BOARD_LAUNCH_SF"/>
 								</option>
 								<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__C_SRCS.702508174" name="C Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__C_SRCS"/>
 								<inputType id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__CPP_SRCS.1518502774" name="C++ Sources" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compiler.inputType__CPP_SRCS"/>

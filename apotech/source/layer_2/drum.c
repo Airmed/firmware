@@ -24,7 +24,7 @@ void drum_init()
 #define DRUM_HOPPER_1_POS (178)
 #define DRUM_HOPPER_2_POS (356)
 #define DRUM_HOPPER_3_POS (533)
-#define DRUM_STEP_DELAY_MS (50)
+#define DRUM_STEP_DELAY_MS (200)
 
 void drum_set_hopper(drum_hoppers_e hopper)
 {

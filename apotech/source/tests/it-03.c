@@ -6,7 +6,7 @@ extern void hardware_init();
 
 void * it_03_thread(void * arg0)
 {
-    drum_hoppers_e hopper_next = DRUM_HOPPER_0;
+    drum_hoppers_e hopper_next = DRUM_HOPPER_1;
 
     hardware_init();
 
