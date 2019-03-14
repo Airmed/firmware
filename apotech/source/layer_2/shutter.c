@@ -29,7 +29,7 @@ void shutter_init()
 #define STEP_COUNT_MAX (90)
 #define SLOW_STEP_DELAY_MS (100)
 #define FAST_STEP_DELAY_MS (2)
-#define SENSED_STEPS_OPEN (10)
+#define SENSED_STEPS_OPEN (2)
 #define SHUTTER_OPEN_DELAY_US (10000)
 #define VIBRATE_REPS (3)
 #define VIBRATE_STEP_COUNT (10)
@@ -49,15 +49,18 @@ void shutter_dispense()
 
     stepper_start(&shutter_motor, STEP_COUNT_MAX, SLOW_STEP_DELAY_MS);
 
-    while (sensor_status == false && sensor_status_last == false)
+    while (shutter_motor.position < STEP_COUNT_MAX)
     {
         sensor_status_last = sensor_status;
         sensor_status = sensor_get_status();
+        if (sensor_status == true && sensor_status_last == true)
+        {
+            stepper_start(&shutter_motor, shutter_motor.position + SENSED_STEPS_OPEN, FAST_STEP_DELAY_MS);
+            stepper_wait(&shutter_motor);
+            usleep(SHUTTER_OPEN_DELAY_US);
+            break;
+        }
     }
-
-    stepper_start(&shutter_motor, shutter_motor.position + SENSED_STEPS_OPEN, FAST_STEP_DELAY_MS);
-    stepper_wait(&shutter_motor);
-    usleep(SHUTTER_OPEN_DELAY_US);
 
     stepper_start(&shutter_motor, -STEP_COUNT_OVERSHOOT, FAST_STEP_DELAY_MS);
     stepper_wait(&shutter_motor);
