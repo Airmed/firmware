@@ -50,8 +50,10 @@
 
 extern void * provisioning_thread(void * arg0);
 extern void * application_thread(void * arg0);
+extern void * mainThread(void *arg0);
 extern void * it_02_thread(void * arg0);
 extern void * it_03_thread(void * arg0);
+
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    4096
@@ -61,7 +63,7 @@ extern void * it_03_thread(void * arg0);
  */
 int main(void)
 {
-    pthread_t provisioning, application;
+    pthread_t provisioning, application, httpget;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
     int retc;
@@ -85,6 +87,9 @@ int main(void)
 
     retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
     if(retc != 0) while(1);
+
+    retc = pthread_create(&httpget, &pAttrs, mainThread, NULL);
+        if(retc != 0) while(1);
 
     GPIO_init();
 
