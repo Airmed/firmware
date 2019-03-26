@@ -1,39 +1,22 @@
 
 #include "board.h"
-#include "drum.h"
 #include "gpio.h"
+#include "shutter.h"
 
 #include <pthread.h>
 #include <ti/sysbios/BIOS.h>
 
 extern void hardware_init();
 
-void * it_03_thread(void * arg0)
+void * at_01_thread(void * arg0)
 {
-    drum_hoppers_e hopper_next = DRUM_HOPPER_1;
-
     hardware_init();
 
     while (true)
     {
         while (button_patient_get_status() == false);
 
-        drum_set_hopper(hopper_next);
-        switch (hopper_next)
-        {
-            case DRUM_HOPPER_0:
-                hopper_next = DRUM_HOPPER_1;
-                break;
-            case DRUM_HOPPER_1:
-                hopper_next = DRUM_HOPPER_2;
-                break;
-            case DRUM_HOPPER_2:
-                hopper_next = DRUM_HOPPER_3;
-                break;
-            case DRUM_HOPPER_3:
-                hopper_next = DRUM_HOPPER_0;
-                break;
-        }
+        shutter_dispense();
     }
 
     return 0;
@@ -66,7 +49,7 @@ int main(void)
     retc |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
     if(retc != 0) while(1);
 
-    retc = pthread_create(&application, &pAttrs, it_03_thread, NULL);
+    retc = pthread_create(&application, &pAttrs, at_01_thread, NULL);
     if(retc != 0) while(1);
 
     BIOS_start();

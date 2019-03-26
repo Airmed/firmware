@@ -50,8 +50,6 @@
 
 extern void * provisioning_thread(void * arg0);
 extern void * application_thread(void * arg0);
-extern void * it_02_thread(void * arg0);
-extern void * it_03_thread(void * arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    4096
@@ -86,18 +84,8 @@ int main(void)
     retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
     if(retc != 0) while(1);
 
-    GPIO_init();
-
-#if !defined(IT_02) && !defined(IT_03)
     retc = pthread_create(&application, &pAttrs, application_thread, NULL);
     if(retc != 0) while(1);
-#elif  defined(IT_02)
-    retc = pthread_create(&application, &pAttrs, it_02_thread, NULL);
-    if(retc != 0) while(1);
-#elif defined(IT_03)
-    retc = pthread_create(&application, &pAttrs, it_03_thread, NULL);
-    if(retc != 0) while(1);
-#endif
 
     BIOS_start();
 
