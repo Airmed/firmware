@@ -10,12 +10,11 @@ void drum_init()
 {
     drum_motor.position = 0;
     drum_motor.position_target = 0;
-    drum_motor.state = STEPPER_STATE_A;
     drum_motor.enable = BOARD_DRUM_EN;
-    drum_motor.coil0_p = BOARD_DRUM_COIL0_P;
-    drum_motor.coil0_n = BOARD_DRUM_COIL0_N;
-    drum_motor.coil1_p = BOARD_DRUM_COIL1_P;
-    drum_motor.coil1_n = BOARD_DRUM_COIL1_N;
+    drum_motor.sleep = BOARD_DRUM_SLEEP;
+    drum_motor.reset = BOARD_DRUM_RESET;
+    drum_motor.dir = BOARD_DRUM_DIR;
+    drum_motor.step = BOARD_DRUM_STEP;
 
     stepper_init(&drum_motor);
 }

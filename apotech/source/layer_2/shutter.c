@@ -8,20 +8,27 @@
 
 #include <unistd.h>
 
+sensor_t sensor_high;
+sensor_t sensor_low;
 stepper_t shutter_motor;
 
 void shutter_init()
 {
-    sensor_init();
+    sensor_high.pin = BOARD_SENSOR_HIGH;
+    sensor_high.adc = BOARD_SENSOR_HIGH_ADC;
+    sensor_init(&sensor_high);
+
+    sensor_low.pin = BOARD_SENSOR_LOW;
+    sensor_low.adc = BOARD_SENSOR_LOW_ADC;
+    sensor_init(&sensor_low);
 
     shutter_motor.position = 0;
     shutter_motor.position_target = 0;
-    shutter_motor.state = STEPPER_STATE_A;
     shutter_motor.enable = BOARD_SHUTTER_EN;
-    shutter_motor.coil0_p = BOARD_SHUTTER_COIL0_P;
-    shutter_motor.coil0_n = BOARD_SHUTTER_COIL0_N;
-    shutter_motor.coil1_p = BOARD_SHUTTER_COIL1_P;
-    shutter_motor.coil1_n = BOARD_SHUTTER_COIL1_N;
+    shutter_motor.sleep = BOARD_SHUTTER_SLEEP;
+    shutter_motor.reset = BOARD_SHUTTER_RESET;
+    shutter_motor.dir = BOARD_SHUTTER_DIR;
+    shutter_motor.step = BOARD_SHUTTER_STEP;
 
     stepper_init(&shutter_motor);
 }
@@ -52,7 +59,7 @@ void shutter_dispense()
     while (shutter_motor.position < STEP_COUNT_MAX)
     {
         sensor_status_last = sensor_status;
-        sensor_status = sensor_get_status();
+        sensor_status = sensor_get_status(&sensor_high);
         if (sensor_status == true && sensor_status_last == true)
         {
             stepper_start(&shutter_motor, shutter_motor.position + SENSED_STEPS_OPEN, FAST_STEP_DELAY_MS);
