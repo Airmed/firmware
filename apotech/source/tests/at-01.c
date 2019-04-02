@@ -1,5 +1,6 @@
 
 #include "board.h"
+#include "drum.h"
 #include "gpio.h"
 #include "shutter.h"
 
@@ -8,15 +9,39 @@
 
 extern void hardware_init();
 
+#define PILLS_PER_HOPPER (10)
+
 void * at_01_thread(void * arg0)
 {
+    shutter_dispense_t ret;
+
     hardware_init();
 
     while (true)
     {
-        while (button_patient_get_status() == false);
+        for (uint8_t pills_dispensed = 0; pills_dispensed < PILLS_PER_HOPPER; pills_dispensed++)
+        {
+            while (button_patient_get_status() == false);
 
-        shutter_dispense();
+            ret = shutter_dispense();
+            while (ret == SHUTTER_DISPENSE_NONE)
+            {
+                ret = shutter_dispense();
+            }
+
+            if (ret == SHUTTER_DISPENSE_SUCCESS)
+            {
+                led_status_on();
+                led_error_off();
+            }
+            else if (ret == SHUTTER_DISPENSE_MULTIPLE)
+            {
+                led_status_off();
+                led_error_on();
+            }
+        }
+
+        drum_next_hopper();
     }
 
     return 0;

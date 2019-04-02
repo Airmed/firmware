@@ -50,3 +50,26 @@ void drum_set_hopper(drum_hoppers_e hopper)
     stepper_start(&drum_motor, pos, DRUM_STEP_DELAY_MS);
     stepper_wait(&drum_motor);
 }
+
+void drum_next_hopper()
+{
+    static drum_hoppers_e hopper = DRUM_HOPPER_0;
+
+    switch (hopper)
+    {
+        case DRUM_HOPPER_0:
+            hopper = DRUM_HOPPER_1;
+            break;
+        case DRUM_HOPPER_1:
+            hopper = DRUM_HOPPER_2;
+            break;
+        case DRUM_HOPPER_2:
+            hopper = DRUM_HOPPER_3;
+            break;
+        case DRUM_HOPPER_3:
+            hopper = DRUM_HOPPER_0;
+            break;
+    }
+
+    drum_set_hopper(hopper);
+}
