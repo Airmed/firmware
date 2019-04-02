@@ -6,11 +6,15 @@
 #include "sensor.h"
 #include "stepper.h"
 
+#include <ti/sysbios/knl/Clock.h>
 #include <unistd.h>
+#include <xdc/runtime/Error.h>
 
 sensor_t sensor_high;
 sensor_t sensor_low;
 stepper_t shutter_motor;
+
+xdc_Void shutter_count(xdc_UArg arg1);
 
 void shutter_init()
 {
@@ -41,10 +45,20 @@ void shutter_init()
 #define VIBRATE_REPS (3)
 #define VIBRATE_STEP_COUNT (10)
 #define STEP_COUNT_OVERSHOOT (32)
+#define PILL_COUNT_DELAY_US (1000000)
 
-void shutter_dispense()
+shutter_dispense_t shutter_dispense()
 {
     bool sensor_status = false, sensor_status_last = false;
+    volatile uint8_t pills_dispensed = 0;
+
+    Clock_Params clock_params;
+
+    Clock_Params_init(&clock_params);
+    clock_params.period = 1;
+    clock_params.startFlag = TRUE;
+    clock_params.arg = (xdc_UArg)&pills_dispensed;
+    Clock_Handle pill_count_clock = Clock_create(shutter_count, 1, &clock_params, Error_IGNORE);
 
     for (uint8_t i = 0; i < VIBRATE_REPS; i++)
     {
@@ -73,4 +87,26 @@ void shutter_dispense()
     stepper_wait(&shutter_motor);
 
     shutter_motor.position = 0;
+
+    usleep(PILL_COUNT_DELAY_US);
+    Clock_delete(&pill_count_clock);
+
+    if (pills_dispensed == 0) return SHUTTER_DISPENSE_NONE;
+    else if (pills_dispensed == 1) return SHUTTER_DISPENSE_SUCCESS;
+    else return SHUTTER_DISPENSE_MULTIPLE;
+}
+
+xdc_Void shutter_count(xdc_UArg arg1)
+{
+    volatile uint8_t * ptr_pills_dispensed = (volatile uint8_t *)arg1;
+    static bool sensor_status_last;
+
+    bool sensor_status = sensor_get_status(&sensor_low);
+
+    if (sensor_status == true && sensor_status_last == false)
+    {
+        *ptr_pills_dispensed++;
+    }
+
+    sensor_status_last = sensor_status;
 }

@@ -15,7 +15,7 @@ void sensor_init(sensor_t * sensor)
     ADC_init();
     ADC_Params_init(&params);
 
-    sensor->adc_handle = ADC_open(0, &params);
+    sensor->adc_handle = ADC_open(sensor->adc, &params);
     if (sensor->adc_handle == 0) while (1);
 
     ADC_convert(sensor->adc_handle, &sensor->reference_val);
