@@ -31,7 +31,7 @@
  */
  
 #include "string.h"
-//#include <ti/display/Display.h>
+#include <ti/display/Display.h>
 #include <ti/net/http/httpclient.h>
 #include "semaphore.h"
 #include "Board.h"
@@ -47,7 +47,7 @@
 #define USER_AGENT            "HTTPClient (ARM; TI-RTOS)"
 #define HTTP_MIN_RECV         (256)
 const char header[] = "Basic dZdDpXGVz0N0\r\nContent-Type: application/json";
-//extern Display_Handle display;
+extern Display_Handle display;
 extern sem_t ipEventSyncObj;
 extern void printError(char *errString,
                        int code);
@@ -92,7 +92,7 @@ extern void printError(char *errString,
     
     ret  = HTTPClient_sendRequest(httpClientHandle, HTTP_METHOD_POST, REQUEST_POST_URI, builtBuffPost, strlen(builtBuffPost), 0);
 
-    //Display_printf(display, 0, 0, "post ret = %d \n", ret);
+    Display_printf(display, 0, 0, "post ret = %d \n", ret);
     
      len = 0;
     do
@@ -103,12 +103,12 @@ extern void printError(char *errString,
         {
             printError("httpTask: response body processing failed", ret);
         }
-        //Display_printf(display, 0, 0, "%.*s \r\n",ret,data);
+        Display_printf(display, 0, 0, "%.*s \r\n",ret,data);
         len += ret;
     }
     while(moreDataFlag);
-    //Display_printf(display, 0, 0, "PUSH SUCCESS \n");
-    //Display_printf(display, 0, 0, "Received %d bytes of payload\n", len);
+    Display_printf(display, 0, 0, "PUSH SUCCESS \n");
+    Display_printf(display, 0, 0, "Received %d bytes of payload\n", len);
 
     ret = HTTPClient_disconnect(httpClientHandle);
     if(ret < 0)
@@ -155,7 +155,7 @@ extern void printError(char *errString,
     
     ret  = HTTPClient_sendRequest(httpClientHandle, HTTP_METHOD_POST, REQUEST_POST_URI, builtBuffGet, strlen(builtBuffGet), 0);
 
-    //Display_printf(display, 0, 0, "post ret = %d \n", ret);
+    Display_printf(display, 0, 0, "post ret = %d \n", ret);
     
      len = 0;
     do
@@ -166,12 +166,12 @@ extern void printError(char *errString,
         {
             printError("httpTask: response body processing failed", ret);
         }
-        //Display_printf(display, 0, 0, "%.*s \r\n",ret,data);
+        Display_printf(display, 0, 0, "%.*s \r\n",ret,data);
         len += ret;
     }
     while(moreDataFlag);
-    //Display_printf(display, 0, 0, "PULL SUCCESS \n");
-    //Display_printf(display, 0, 0, "Received %d bytes of payload\n", len);
+    Display_printf(display, 0, 0, "PULL SUCCESS \n");
+    Display_printf(display, 0, 0, "Received %d bytes of payload\n", len);
 
     ret = HTTPClient_disconnect(httpClientHandle);
     if(ret < 0)

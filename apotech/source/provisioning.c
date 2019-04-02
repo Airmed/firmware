@@ -690,6 +690,7 @@ void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *slFatalErrorEvent)
 //*****************************************************************************
 void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 {
+    LOG_MESSAGE("In SimpleLinkNetAppEventHandler\n");
     switch(pNetAppEvent->Id)
     {
     case SL_NETAPP_EVENT_IPV4_ACQUIRED:
@@ -1453,6 +1454,7 @@ int16_t SignalEvent(AppEvent event)
 void SimpleLinkInitCallback(uint32_t status,
                             SlDeviceInitInfo_t *DeviceInitInfo)
 {
+    LOG_MESSAGE("IN FUNCTION/n");
     if ((int32_t)status == SL_ERROR_RESTORE_IMAGE_COMPLETE)
     {
         LOG_MESSAGE(
@@ -1739,6 +1741,7 @@ int32_t ProvisioningStart(void)
 //*****************************************************************************
 void * ProvisioningTask(void *arg)
 {
+    //LOG_MESSAGE("Provisioning task called\n");
     int32_t            iRetVal = 0;
     unsigned char      event;
     Provisioning_TableEntry_t         *pEntry = NULL;
@@ -1828,7 +1831,7 @@ static void DisplayBanner(char * AppName)
 
     LOG_MESSAGE("\n\n\n\r");
     LOG_MESSAGE("\t\t *************************************************\n\r");
-    LOG_MESSAGE("\t\t            %s Application       \n\r", AppName);
+    LOG_MESSAGE("\t\t            %s Application       Check1\n\r", AppName);
     LOG_MESSAGE("\t\t *************************************************\n\r");
     LOG_MESSAGE("\n\n\n\r");
 }
@@ -1842,8 +1845,10 @@ static void DisplayBanner(char * AppName)
 //! \return none
 //!
 //*****************************************************************************
+#if 0
 void * provisioning_thread( void *arg )
 {
+    //LOG_MESSAGE("Provisioning Thread Called");
     uint32_t             RetVal;
     pthread_attr_t      pAttrs;
     pthread_attr_t      pAttrs_spawn;
@@ -1860,6 +1865,93 @@ void * provisioning_thread( void *arg )
     /* Switch off all LEDs on boards */
     GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
     GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
+
+    /* create the sl_Task */
+    pthread_attr_init(&pAttrs_spawn);
+    priParam.sched_priority = SPAWN_TASK_PRIORITY;
+    RetVal = pthread_attr_setschedparam(&pAttrs_spawn, &priParam);
+    RetVal |= pthread_attr_setstacksize(&pAttrs_spawn, TASK_STACK_SIZE);
+    RetVal = pthread_create(&gSpawnThread, &pAttrs_spawn, sl_Task, NULL);
+    if(RetVal)
+    {
+        while(1)
+        {
+            ;
+        }
+    }
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = 1;
+    RetVal = pthread_attr_setschedparam(&pAttrs, &priParam);
+    RetVal |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
+
+    if(RetVal)
+    {
+        /* error handling */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    RetVal = pthread_create(&gProvisioningThread, &pAttrs, ProvisioningTask,
+                            NULL);
+    if(RetVal)
+    {
+        while(1)
+        {
+            ;
+        }
+    }
+
+    /* create led display thread */
+    pthread_attr_init(&pAttrs_display);
+    priParam.sched_priority = 5;
+    RetVal = pthread_attr_setschedparam(&pAttrs_display, &priParam);
+    RetVal |= pthread_attr_setstacksize(&pAttrs_display,
+                                        DISPLAY_TASK_STACK_SIZE);
+
+    if(RetVal)
+    {
+        /* error handling */
+        while(1)
+        {
+            ;
+        }
+    }
+
+    RetVal = pthread_create(&gDisplayThread, &pAttrs_display, UpdateLedDisplay,
+                            NULL);
+
+    if(RetVal)
+    {
+        while(1)
+        {
+            ;
+        }
+    }
+
+    return(0);
+}
+#endif
+
+void * provisioning_task( void *arg )
+{
+    uint32_t             RetVal;
+    pthread_attr_t      pAttrs;
+    pthread_attr_t      pAttrs_spawn;
+    pthread_attr_t      pAttrs_display;
+    struct sched_param  priParam;
+
+    GPIO_init();
+    SPI_init();
+
+    /* Initial Terminal, and print Application name */
+    InitTerm();
+    DisplayBanner(APPLICATION_NAME);
+
+    /* Switch off all LEDs on boards */
+        GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
+        GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
 
     /* create the sl_Task */
     pthread_attr_init(&pAttrs_spawn);
@@ -1931,3 +2023,4 @@ void * provisioning_thread( void *arg )
 
     return(0);
 }
+

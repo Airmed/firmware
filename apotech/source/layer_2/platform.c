@@ -32,7 +32,7 @@
 
 #include <ti/drivers/net/wifi/simplelink.h>
 #include <ti/drivers/net/wifi/slnetifwifi.h>
-//#include <ti/display/Display.h>
+#include <ti/display/Display.h>
 #include <ti/drivers/SPI.h>
 
 #include "Board.h"
@@ -49,13 +49,13 @@
 #define SLNET_IF_WIFI_PRIO                    (5)
 #define SLNET_IF_WIFI_NAME                    "CC32xx"
 /* AP SSID */
-#define SSID_NAME                             "IT_Test"
+#define SSID_NAME                             "Craic Huset"
 
 /* Security type could be SL_WLAN_SEC_TYPE_WPA_WPA2 */      
 #define SECURITY_TYPE                         SL_WLAN_SEC_TYPE_WPA_WPA2 /* SL_WLAN_SEC_TYPE_OPEN */ 
 
 /* Password of the secured AP */
-#define SECURITY_KEY                          "airmed_test"       
+#define SECURITY_KEY                          "kristinakelseysam"
 
 #define builtBuffPush           "{\"query\":\"insert into test(one, two, three, four) values (101, 102, 103, 104);\"}" /* Push data to database */
 #define builtBuffPull           "{\"query\":\"select * from test;\"}" /* Get data from database */
@@ -64,7 +64,7 @@ pthread_t httpThread = (pthread_t)NULL;
 pthread_t spawn_thread = (pthread_t)NULL;
 
 int32_t mode;
-//Display_Handle display;
+Display_Handle display;
 
 extern void* httpTaskPost(void* pvParameters);
 extern void* httpTaskPull(void* pvParameters);
@@ -76,8 +76,8 @@ extern const char *WlanStatus[];
 void printError(char *errString,
                 int code)
 {
-    //Display_printf(display, 0, 0, "Error! code = %d, Description = %s\n", code,
-                  // errString);
+    Display_printf(display, 0, 0, "Error! code = %d, Description = %s\n", code,
+                   errString);
     while(1)
     {
         ;
@@ -211,11 +211,11 @@ void mainThread(void *pvParameters)
     int32_t status = 0;
     pthread_attr_t pAttrs_spawn;
     struct sched_param priParam;
-	
+
     SPI_init();
+    //Display_init();
+    //display = Display_open(Display_Type_UART, NULL);
     /*
-    Display_init();
-    display = Display_open(Display_Type_UART, NULL);
     if(display == NULL)
     {
         while(1)
