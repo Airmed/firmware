@@ -38,6 +38,8 @@
 #include "Board.h"
 #include "pthread.h"
 #include "semaphore.h"
+#include <uart_term.h>
+
 
 #define APPLICATION_NAME                      "Database Integration"
 #define DEVICE_ERROR                          ("Device error, please refer \"DEVICE ERRORS CODES\" section in errors.h")
@@ -57,10 +59,9 @@
 /* Password of the secured AP */
 #define SECURITY_KEY                          "kristinakelseysam"
 
-#define builtBuffPush           "{\"query\":\"insert into test(one, two, three, four) values (101, 102, 103, 104);\"}" /* Push data to database */
-#define builtBuffPull           "{\"query\":\"select * from test;\"}" /* Get data from database */
+#define LOG_MESSAGE UART_PRINT
 
-pthread_t httpThread = (pthread_t)NULL;
+//pthread_t httpThread = (pthread_t)NULL;
 pthread_t spawn_thread = (pthread_t)NULL;
 
 int32_t mode;
@@ -107,6 +108,7 @@ void printError(char *errString,
  */
 void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
 {
+    LOG_MESSAGE("In SimpleLinkNetAppEventHandlerUnused\n");
     int32_t             status = 0;
     pthread_attr_t      pAttrs;
     struct sched_param  priParam;
@@ -130,7 +132,7 @@ void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
         SlNetUtil_init(0);
         if(mode != ROLE_AP)
         {
-            /*Display_printf(display, 0, 0,"[NETAPP EVENT] IP Acquired: IP=%d.%d.%d.%d , "
+            Display_printf(display, 0, 0,"[NETAPP EVENT] IP Acquired: IP=%d.%d.%d.%d , "
                         "Gateway=%d.%d.%d.%d\n\r",
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Ip,3),
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Ip,2),
@@ -140,16 +142,16 @@ void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Gateway,2),
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Gateway,1),
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Gateway,0));
-                        */
+
 
             pthread_attr_init(&pAttrs);
             priParam.sched_priority = 1;
             status = pthread_attr_setschedparam(&pAttrs, &priParam);
             status |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
-
-            status = pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
-            pthread_join(&httpThread, NULL);
-            status = pthread_create(&httpThread, &pAttrs, httpTaskPull, NULL);
+            LOG_MESSAGE("Call POST\n");
+            //status = pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
+            //pthread_join(&httpThread, NULL);
+            //status = pthread_create(&httpThread, &pAttrs, httpTaskPull, NULL);
 
 
             if(status)
@@ -234,7 +236,7 @@ void mainThread(void *pvParameters)
     status = pthread_attr_setschedparam(&pAttrs_spawn, &priParam);
     status |= pthread_attr_setstacksize(&pAttrs_spawn, SPAWN_STACK_SIZE);
 
-    status = pthread_create(&spawn_thread, &pAttrs_spawn, sl_Task, NULL);
+    //status = pthread_create(&spawn_thread, &pAttrs_spawn, sl_Task, NULL);
     if(status)
     {
         printError("Task create failed", status);

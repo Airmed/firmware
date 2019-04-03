@@ -177,7 +177,7 @@ void dummyOutput(void)
 #include "Board.h"
 
 extern void * provisioning_task(void *arg0);
-extern void * httpTaskPull(void *arg0);
+//extern void * httpTaskPull(void *arg0);
 
 /* Stack size in bytes */
 #define THREADSTACKSIZE    4096
@@ -187,7 +187,7 @@ extern void * httpTaskPull(void *arg0);
  */
 int main(void)
 {
-    pthread_t provisioning, http;
+    pthread_t provisioning;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
     int retc;
@@ -234,11 +234,11 @@ int main(void)
         }
     }
 
-    usleep(10000);
+    //usleep(10000);
 
     /* Polling Database */
     //pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
-    pthread_create(&http, &pAttrs, httpTaskPull, NULL);
+    //pthread_create(&http, &pAttrs, httpTaskPull, NULL);
 
     GPIO_init();
 

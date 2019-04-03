@@ -55,6 +55,8 @@
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
+#include <ti/display/Display.h>
+
 
 /* TI-DRIVERS Header files */
 #include <ti/drivers/net/wifi/simplelink.h>
@@ -65,9 +67,12 @@
 #include "mqueue.h"
 #include <time.h>
 #include <uart_term.h>
+#include <ti/drivers/net/wifi/slnetifwifi.h>
+#include <ti/display/Display.h>
+#include <ti/drivers/SPI.h>
 
 /* Application Version and Naming*/
-#define APPLICATION_NAME         "PROVISIONING"
+#define APPLICATION_NAME        "PROVISIONING"
 #define APPLICATION_VERSION "01.00.00.14"
 
 /* USER's defines */
@@ -112,6 +117,22 @@
 #define ROLE_STA 0
 #define ROLE_AP  2
 
+#define SLNET_IF_WIFI_PRIO                    (5)
+#define SLNET_IF_WIFI_NAME                    "CC32xx"
+
+extern void * httpTaskPull(void *arg0);
+extern void* httpTaskPost(void* pvParameters);
+
+pthread_t httpThread = (pthread_t)NULL;
+//pthread_t spawn_thread = (pthread_t)NULL;
+
+/* Database selection*/
+typedef enum
+{
+    Medications,
+    Schedule
+
+}DatabaseSelect;
 
 /* Application's states */
 typedef enum
@@ -212,6 +233,8 @@ uint32_t gErrledCount = 0;
 uint8_t  gErrLedState = 0;
 uint8_t  gWaitForConn = 0;
 LedState gLedDisplayState = LedState_CONNECTION;
+int32_t mode;
+
 
 timer_t gTimer;
 
@@ -407,6 +430,7 @@ const Provisioning_TableEntry_t gTransitionTable[AppState_MAX][AppEvent_MAX] =
 /* Application state's context */
 AppState g_CurrentState;
 
+
 /*****************************************************************************
                   SimpleLink Callback Functions
 *****************************************************************************/
@@ -422,7 +446,6 @@ AppState g_CurrentState;
 //*****************************************************************************
 void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
 {
-
     switch(pWlanEvent->Id)
     {
     case SL_WLAN_EVENT_CONNECT:
@@ -690,7 +713,7 @@ void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *slFatalErrorEvent)
 //*****************************************************************************
 void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 {
-    LOG_MESSAGE("In SimpleLinkNetAppEventHandler\n");
+
     switch(pNetAppEvent->Id)
     {
     case SL_NETAPP_EVENT_IPV4_ACQUIRED:
@@ -1177,6 +1200,7 @@ int32_t HandleProvisioningComplete(void)
     LOG_MESSAGE("[Provisioning] "
 	"Provisioning Application Ended Successfully \r\n ");
 
+
     /* [External configuration] - 
 	Stop the external provisioning process (if running) */
     if (TRUE == IsActiveExternalConfiguration())
@@ -1238,6 +1262,7 @@ int32_t SendPingToGW(void)
     {
         gPingSuccess++;
     }
+/*
     LOG_MESSAGE(
         "Reply from %d.%d.%d.%d: %s, "
         "Time=%dms, \tOverall Stat Success (%d/%d)\r\n",
@@ -1249,7 +1274,22 @@ int32_t SendPingToGW(void)
          report.PacketsReceived) ? "SUCCESS" : "FAIL",
         (report.PacketsSent ==
          report.PacketsReceived) ? report.MinRoundTime : 0,
-        gPingSuccess, gPingSent);
+        gPingSuccess, gPingSent);*/
+
+    if(report.PacketsSent != report.PacketsReceived){
+        LOG_MESSAGE(
+                "Reply from %d.%d.%d.%d: %s, "
+                "Time=%dms, \tOverall Stat Success (%d/%d)\r\n",
+                SL_IPV4_BYTE(ipV4.IpGateway,3),SL_IPV4_BYTE(ipV4.IpGateway,
+                                                            2),
+                SL_IPV4_BYTE(ipV4.IpGateway,1),SL_IPV4_BYTE(ipV4.IpGateway,
+                                                            0),
+                (report.PacketsSent ==
+                 report.PacketsReceived) ? "SUCCESS" : "FAIL",
+                (report.PacketsSent ==
+                 report.PacketsReceived) ? report.MinRoundTime : 0,
+                gPingSuccess, gPingSent);
+    }
 
     StartAsyncEvtTimer(PING_TIMEOUT_SEC);
 
@@ -1268,10 +1308,16 @@ int32_t SendPingToGW(void)
 //*****************************************************************************
 int32_t HandleUserApplication(void)
 {
+    pthread_attr_t      pAttrs;
     LOG_MESSAGE("[App] User Application Started \r\n ");
     gIsWlanConnected = 1;
     gWaitForConn = 0;
+    int32_t             status = 0;
+    struct sched_param  priParam;
+
+
     /* as long as the device connected, run user application */
+
 
     /* Get IP and Gateway information */
     uint16_t len = sizeof(SlNetCfgIpV4Args_t);
@@ -1306,6 +1352,35 @@ int32_t HandleUserApplication(void)
     /* Reset Over All Ping Statistics*/
     gPingSent = 0;
     gPingSuccess = 0;
+
+    /* Initialize SlNetSock layer with CC3x20 interface                   */
+    SlNetIf_init(0);
+    SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME,
+               (const SlNetIf_Config_t *)&SlNetIfConfigWifi,
+                SLNET_IF_WIFI_PRIO);
+
+    SlNetSock_init(0);
+    SlNetUtil_init(0);
+
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = 1;
+    status = pthread_attr_setschedparam(&pAttrs, &priParam);
+    status |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
+
+    /* Read and write from Database*/
+    //status = pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
+    //pthread_join(&httpThread, NULL);
+    status = pthread_create(&httpThread, &pAttrs, httpTaskPull(Medications), NULL);
+    pthread_join(&httpThread, NULL);
+    status = pthread_create(&httpThread, &pAttrs, httpTaskPull(Schedule), NULL);
+
+
+
+    if(status)
+    {
+        LOG_MESSAGE("Task create failed: %d", status);
+    }
+
 
     StartAsyncEvtTimer(PING_TIMEOUT_SEC);
 
@@ -1454,7 +1529,6 @@ int16_t SignalEvent(AppEvent event)
 void SimpleLinkInitCallback(uint32_t status,
                             SlDeviceInitInfo_t *DeviceInitInfo)
 {
-    LOG_MESSAGE("IN FUNCTION/n");
     if ((int32_t)status == SL_ERROR_RESTORE_IMAGE_COMPLETE)
     {
         LOG_MESSAGE(
@@ -1942,6 +2016,7 @@ void * provisioning_task( void *arg )
     pthread_attr_t      pAttrs_display;
     struct sched_param  priParam;
 
+
     GPIO_init();
     SPI_init();
 
@@ -2023,4 +2098,3 @@ void * provisioning_task( void *arg )
 
     return(0);
 }
-
