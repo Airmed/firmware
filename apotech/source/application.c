@@ -29,6 +29,8 @@ void * application_thread(void * arg0)
 
 void hardware_init()
 {
+    GPIO_init();
+
     shutter_init();
     drum_init();
 

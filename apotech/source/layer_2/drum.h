@@ -13,5 +13,6 @@ typedef enum
 void drum_init();
 
 void drum_set_hopper(drum_hoppers_e hopper);
+void drum_next_hopper();
 
 #endif

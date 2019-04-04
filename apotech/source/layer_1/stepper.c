@@ -10,6 +10,9 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <xdc/runtime/Error.h>
 
+#define STEPPER_DIR_CW (BOARD_PIN_ON)
+#define STEPPER_DIR_CCW (BOARD_PIN_OFF)
+
 xdc_Void stepper_handler(xdc_UArg arg1);
 
 void stepper_init(stepper_t * stepper)
@@ -22,94 +25,46 @@ void stepper_init(stepper_t * stepper)
     clock_params.arg = (xdc_UArg)stepper;
     stepper->timer = Clock_create(stepper_handler, 100, &clock_params, Error_IGNORE);
 
-    GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
-    GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-    GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-    GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
+    GPIO_write(stepper->sleep, BOARD_PIN_ON);
+    GPIO_write(stepper->dir, BOARD_PIN_OFF);
+    GPIO_write(stepper->step, BOARD_PIN_OFF);
 
+    stepper_reset(stepper);
     stepper_disable(stepper);
 }
 
 void stepper_enable(stepper_t * stepper)
 {
-    GPIO_write(stepper->enable, BOARD_PIN_ON);
+    GPIO_write(stepper->enable, BOARD_PIN_OFF);
 }
 
 void stepper_disable(stepper_t * stepper)
 {
-    GPIO_write(stepper->enable, BOARD_PIN_OFF);
+    GPIO_write(stepper->enable, BOARD_PIN_ON);
+}
+
+void stepper_reset(stepper_t * stepper)
+{
+    GPIO_write(stepper->reset, BOARD_PIN_OFF);
+    GPIO_write(stepper->reset, BOARD_PIN_ON);
 }
 
 void stepper_increment_position(stepper_t * stepper)
 {
-    switch (stepper->state)
-    {
-        case STEPPER_STATE_A:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
-            stepper->state = STEPPER_STATE_B;
-            break;
-        case STEPPER_STATE_B:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
-            stepper->state = STEPPER_STATE_C;
-            break;
-        case STEPPER_STATE_C:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
-            stepper->state = STEPPER_STATE_D;
-            break;
-        case STEPPER_STATE_D:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
-            stepper->state = STEPPER_STATE_A;
-            break;
-    }
+    if (GPIO_read(stepper->dir) == STEPPER_DIR_CCW) GPIO_write(stepper->dir, STEPPER_DIR_CW);
+
+    GPIO_write(stepper->step, BOARD_PIN_ON);
+    GPIO_write(stepper->step, BOARD_PIN_OFF);
 
     stepper->position++;
 }
 
 void stepper_decrement_position(stepper_t * stepper)
 {
-    switch (stepper->state)
-    {
-        case STEPPER_STATE_A:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
-            stepper->state = STEPPER_STATE_D;
-            break;
-        case STEPPER_STATE_B:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
-            stepper->state = STEPPER_STATE_A;
-            break;
-        case STEPPER_STATE_C:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_ON);
-            stepper->state = STEPPER_STATE_B;
-            break;
-        case STEPPER_STATE_D:
-            GPIO_write(stepper->coil0_p, BOARD_PIN_OFF);
-            GPIO_write(stepper->coil0_n, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_p, BOARD_PIN_ON);
-            GPIO_write(stepper->coil1_n, BOARD_PIN_OFF);
-            stepper->state = STEPPER_STATE_C;
-            break;
-    }
+    if (GPIO_read(stepper->dir) == STEPPER_DIR_CW) GPIO_write(stepper->dir, STEPPER_DIR_CCW);
+
+    GPIO_write(stepper->step, BOARD_PIN_ON);
+    GPIO_write(stepper->step, BOARD_PIN_OFF);
 
     stepper->position--;
 }
