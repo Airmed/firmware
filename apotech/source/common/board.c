@@ -368,31 +368,23 @@ const PowerCC32XX_ConfigV1 PowerCC32XX_config = {
 #include <ti/drivers/PWM.h>
 #include <ti/drivers/pwm/PWMTimerCC32XX.h>
 
-PWMTimerCC32XX_Object pwmTimerCC3220SObjects[CC3220S_LAUNCHXL_PWMCOUNT];
+PWMTimerCC32XX_Object pwmTimerCC3220SObjects[BOARD_PWM_COUNT];
 
-const PWMTimerCC32XX_HWAttrsV2 pwmTimerCC3220SHWAttrs[CC3220S_LAUNCHXL_PWMCOUNT] = {
+const PWMTimerCC32XX_HWAttrsV2 pwmTimerCC3220SHWAttrs[BOARD_PWM_COUNT] = {
     {    /* CC3220S_LAUNCHXL_PWM6 */
-        .pwmPin = PWMTimerCC32XX_PIN_01
-    },
-    {    /* CC3220S_LAUNCHXL_PWM7 */
-        .pwmPin = PWMTimerCC32XX_PIN_02
+        .pwmPin = BOARD_BUZZER_PWM_PIN
     }
 };
 
-const PWM_Config PWM_config[CC3220S_LAUNCHXL_PWMCOUNT] = {
+const PWM_Config PWM_config[BOARD_PWM_COUNT] = {
     {
         .fxnTablePtr = &PWMTimerCC32XX_fxnTable,
-        .object = &pwmTimerCC3220SObjects[CC3220S_LAUNCHXL_PWM6],
-        .hwAttrs = &pwmTimerCC3220SHWAttrs[CC3220S_LAUNCHXL_PWM6]
-    },
-    {
-        .fxnTablePtr = &PWMTimerCC32XX_fxnTable,
-        .object = &pwmTimerCC3220SObjects[CC3220S_LAUNCHXL_PWM7],
-        .hwAttrs = &pwmTimerCC3220SHWAttrs[CC3220S_LAUNCHXL_PWM7]
+        .object = &pwmTimerCC3220SObjects[BOARD_BUZZER_PWM],
+        .hwAttrs = &pwmTimerCC3220SHWAttrs[BOARD_BUZZER_PWM]
     }
 };
 
-const uint_least8_t PWM_count = CC3220S_LAUNCHXL_PWMCOUNT;
+const uint_least8_t PWM_count = BOARD_PWM_COUNT;
 
 /*
  *  =============================== SDFatFS ===============================

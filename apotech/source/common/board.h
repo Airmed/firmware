@@ -148,12 +148,11 @@ typedef enum CC3220S_LAUNCHXL_I2SName {
  *  @def    CC3220S_LAUNCHXL_PWMName
  *  @brief  Enum of PWM names on the CC3220S_LAUNCHXL dev board
  */
-typedef enum CC3220S_LAUNCHXL_PWMName {
-    CC3220S_LAUNCHXL_PWM6 = 0,
-    CC3220S_LAUNCHXL_PWM7,
+typedef enum {
+    BOARD_BUZZER_PWM = 0,
 
-    CC3220S_LAUNCHXL_PWMCOUNT
-} CC3220S_LAUNCHXL_PWMName;
+    BOARD_PWM_COUNT
+} board_pwm_name;
 
 /*!
  *  @def    CC3220S_LAUNCHXL_SDFatFSName
