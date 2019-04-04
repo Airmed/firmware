@@ -70,9 +70,10 @@
 #include <ti/drivers/net/wifi/slnetifwifi.h>
 #include <ti/display/Display.h>
 #include <ti/drivers/SPI.h>
+#include "httpget.h"
 
 /* Application Version and Naming*/
-#define APPLICATION_NAME        "PROVISIONING"
+#define APPLICATION_NAME        "ACCEPTANCE TESTING"
 #define APPLICATION_VERSION "01.00.00.14"
 
 /* USER's defines */
@@ -120,19 +121,15 @@
 #define SLNET_IF_WIFI_PRIO                    (5)
 #define SLNET_IF_WIFI_NAME                    "CC32xx"
 
-extern void * httpTaskPull(void *arg0);
+extern void * httpTaskPull(DatabaseSelect pvParamaters);
 extern void* httpTaskPost(void* pvParameters);
 
 pthread_t httpThread = (pthread_t)NULL;
+//pthread_t medications = (pthread_t)NULL;
+//pthread_t schedule = (pthread_t)NULL;
+
+
 //pthread_t spawn_thread = (pthread_t)NULL;
-
-/* Database selection*/
-typedef enum
-{
-    Medications,
-    Schedule
-
-}DatabaseSelect;
 
 /* Application's states */
 typedef enum
@@ -1368,10 +1365,11 @@ int32_t HandleUserApplication(void)
     status |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
 
     /* Read and write from Database*/
-    //status = pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
-    //pthread_join(&httpThread, NULL);
+    while(1){
     status = pthread_create(&httpThread, &pAttrs, httpTaskPull(Medications), NULL);
     pthread_join(&httpThread, NULL);
+    usleep(1000000);
+    }
     status = pthread_create(&httpThread, &pAttrs, httpTaskPull(Schedule), NULL);
 
 
@@ -1905,7 +1903,7 @@ static void DisplayBanner(char * AppName)
 
     LOG_MESSAGE("\n\n\n\r");
     LOG_MESSAGE("\t\t *************************************************\n\r");
-    LOG_MESSAGE("\t\t            %s Application       Check1\n\r", AppName);
+    LOG_MESSAGE("\t\t            %s Application       \n\r", AppName);
     LOG_MESSAGE("\t\t *************************************************\n\r");
     LOG_MESSAGE("\n\n\n\r");
 }

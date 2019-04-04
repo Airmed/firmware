@@ -36,6 +36,7 @@
 #include "semaphore.h"
 #include "Board.h"
 #include <uart_term.h>
+#include "httpget.h"
 
 
 #define HOSTNAME              "https://seniordesigndb.herokuapp.com"
@@ -135,9 +136,9 @@ const char *builtBuff[] = {"{\"query\":\"insert into test(one, two, three, four)
  }
  
  
- void* httpTaskPull(void* pvParamaters){
- //void* httpTaskPull(DatabaseSelect pvParamaters){
-    LOG_MESSAGE("IN PULL");
+ //void* httpTaskPull(void* pvParamaters){
+ void* httpTaskPull(DatabaseSelect pvParamaters){
+    //LOG_MESSAGE("IN PULL");
 
     int16_t ret = 0;
     bool moreDataFlag = false;
@@ -147,9 +148,9 @@ const char *builtBuff[] = {"{\"query\":\"insert into test(one, two, three, four)
     char medication[] = "{\"query\":\"select * from medications;\"}";
     char schedule[] = "{\"query\":\"select * from schedule;\"}";
 
-    if(pvParamaters == 0){
+    if(pvParamaters == Medications){
         strcpy(builtBuffGet, medication);
-    } else if(pvParamaters == 1){
+    } else if(pvParamaters == Schedule){
         strcpy(builtBuffGet, schedule);
     }
     
