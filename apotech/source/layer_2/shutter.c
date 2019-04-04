@@ -70,7 +70,7 @@ shutter_dispense_t shutter_dispense()
 
     stepper_start(&shutter_motor, STEP_COUNT_MAX, SLOW_STEP_DELAY_MS);
 
-    while (shutter_motor.position < STEP_COUNT_MAX)
+    while (shutter_motor.position < STEP_COUNT_MAX && pills_dispensed == 0)
     {
         sensor_status_last = sensor_status;
         sensor_status = sensor_get_status(&sensor_high);
@@ -105,7 +105,7 @@ xdc_Void shutter_count(xdc_UArg arg1)
 
     if (sensor_status == true && sensor_status_last == false)
     {
-        *ptr_pills_dispensed++;
+        (*ptr_pills_dispensed)++;
     }
 
     sensor_status_last = sensor_status;

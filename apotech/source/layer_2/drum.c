@@ -19,11 +19,12 @@ void drum_init()
     stepper_init(&drum_motor);
 }
 
+#define DRUM_MICROSTEP_MULTIPLIER (16)
 #define DRUM_HOPPER_0_POS (0)
 #define DRUM_HOPPER_1_POS (178)
 #define DRUM_HOPPER_2_POS (356)
 #define DRUM_HOPPER_3_POS (533)
-#define DRUM_STEP_DELAY_MS (200)
+#define DRUM_STEP_DELAY_MS (5)
 
 void drum_set_hopper(drum_hoppers_e hopper)
 {
@@ -31,16 +32,16 @@ void drum_set_hopper(drum_hoppers_e hopper)
     switch (hopper)
     {
         case DRUM_HOPPER_0:
-            pos = DRUM_HOPPER_0_POS;
+            pos = DRUM_HOPPER_0_POS * DRUM_MICROSTEP_MULTIPLIER;
             break;
         case DRUM_HOPPER_1:
-            pos = DRUM_HOPPER_1_POS;
+            pos = DRUM_HOPPER_1_POS * DRUM_MICROSTEP_MULTIPLIER;
             break;
         case DRUM_HOPPER_2:
-            pos = DRUM_HOPPER_2_POS;
+            pos = DRUM_HOPPER_2_POS * DRUM_MICROSTEP_MULTIPLIER;
             break;
         case DRUM_HOPPER_3:
-            pos = DRUM_HOPPER_3_POS;
+            pos = DRUM_HOPPER_3_POS * DRUM_MICROSTEP_MULTIPLIER;
             break;
         default:
             pos = drum_motor.position;

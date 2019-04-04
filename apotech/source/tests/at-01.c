@@ -10,6 +10,7 @@
 extern void hardware_init();
 
 #define PILLS_PER_HOPPER (10)
+#define DISPENSE_RETRIES (2)
 
 void * at_01_thread(void * arg0)
 {
@@ -22,14 +23,22 @@ void * at_01_thread(void * arg0)
         for (uint8_t pills_dispensed = 0; pills_dispensed < PILLS_PER_HOPPER; pills_dispensed++)
         {
             while (button_patient_get_status() == false);
+            led_status_off();
+            led_error_off();
 
             ret = shutter_dispense();
-            while (ret == SHUTTER_DISPENSE_NONE)
+            for (uint8_t i = 0; i < DISPENSE_RETRIES && ret == SHUTTER_DISPENSE_NONE; i++)
             {
                 ret = shutter_dispense();
             }
 
-            if (ret == SHUTTER_DISPENSE_SUCCESS)
+            if (ret == SHUTTER_DISPENSE_NONE)
+            {
+                led_status_off();
+                led_error_on();
+                break; // hopper is empty
+            }
+            else if (ret == SHUTTER_DISPENSE_SUCCESS)
             {
                 led_status_on();
                 led_error_off();

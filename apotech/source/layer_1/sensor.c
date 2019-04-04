@@ -19,7 +19,7 @@ void sensor_init(sensor_t * sensor)
     if (sensor->adc_handle == 0) while (1);
 
     ADC_convert(sensor->adc_handle, &sensor->reference_val);
-    sensor->reference_val *= 1.5f;
+    sensor->reference_val *= 1.3f;//1.5f;
 }
 
 bool sensor_get_status(sensor_t * sensor)
