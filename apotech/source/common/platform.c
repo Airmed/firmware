@@ -236,7 +236,7 @@ void mainThread(void *pvParameters)
     status = pthread_attr_setschedparam(&pAttrs_spawn, &priParam);
     status |= pthread_attr_setstacksize(&pAttrs_spawn, SPAWN_STACK_SIZE);
 
-    //status = pthread_create(&spawn_thread, &pAttrs_spawn, sl_Task, NULL);
+    status = pthread_create(&spawn_thread, &pAttrs_spawn, sl_Task, NULL);
     if(status)
     {
         printError("Task create failed", status);

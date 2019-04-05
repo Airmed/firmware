@@ -1,21 +1,33 @@
 
 #include "flash.h"
 
-#include "pin_map.h"
-
 #include <stdint.h>
+#include <ti/drivers/net/wifi/fs.h>
+#include <ti/drivers/net/wifi/simplelink.h>
 
-void flash_init()
+static const char configuration_file_name[] = "configuration.txt";
+
+void configuration_init()
 {
-
+    int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name,
+                               SL_FS_CREATE | SL_FS_CREATE_MAX_SIZE( sizeof(configuration_t) ),
+                               NULL);
+    sl_FsClose(handle, NULL, NULL, 0);
 }
 
-void flash_write(uint32_t addr, uint8_t data)
+configuration_t configuration_read()
 {
+    configuration_t ret;
+    int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_READ, NULL);
+    sl_FsRead(handle, 0, (uint8_t *)&ret, sizeof(configuration_t));
+    sl_FsClose(handle, NULL, NULL, 0);
 
+    return ret;
 }
 
-uint8_t flash_read(uint32_t addr)
+void configuration_write(configuration_t data)
 {
-    return 0;
+    int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_WRITE, NULL);
+    sl_FsWrite(handle, 0, (uint8_t *)&data, sizeof(configuration_t));
+    sl_FsClose(handle, NULL, NULL, 0);
 }

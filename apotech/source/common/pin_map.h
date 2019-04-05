@@ -39,8 +39,13 @@
 
 
 /* Buzzer */
+#ifdef BOARD_PROD
 #define BOARD_BUZZER_PIN (GPIOCC32XX_GPIO_09)
 #define BOARD_BUZZER_PWM_PIN (PWMTimerCC32XX_PIN_64)
+#else
+#define BOARD_BUZZER_PIN (GPIOCC32XX_GPIO_10)
+#define BOARD_BUZZER_PWM_PIN (PWMTimerCC32XX_PIN_01)
+#endif
 
 
 /* Shutter */

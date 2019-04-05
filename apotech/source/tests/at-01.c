@@ -1,13 +1,13 @@
 
 #include "board.h"
+#include "buttons.h"
 #include "drum.h"
-#include "gpio.h"
+#include "leds.h"
 #include "shutter.h"
 
 #include <pthread.h>
+#include <stdbool.h>
 #include <ti/sysbios/BIOS.h>
-
-extern void hardware_init();
 
 #define PILLS_PER_HOPPER (10)
 #define DISPENSE_RETRIES (2)
@@ -15,8 +15,6 @@ extern void hardware_init();
 void * at_01_thread(void * arg0)
 {
     shutter_dispense_t ret;
-
-    hardware_init();
 
     while (true)
     {
@@ -56,35 +54,27 @@ void * at_01_thread(void * arg0)
     return 0;
 }
 
-/* Stack size in bytes */
-#define THREADSTACKSIZE    4096
+#define THREADSTACKSIZE (4096)
 
-int main(void)
+int main()
 {
-    pthread_t application;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
-    int retc;
-    int detachState;
+    int ret;
 
-    /* Call board init functions */
-    board_init();
+    hardware_init();
+    software_init();
 
-    /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = 1;
 
-    detachState = PTHREAD_CREATE_DETACHED;
-    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
-    if(retc != 0) while(1);
+    ret = pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);
+    ret |= pthread_attr_setschedparam(&pAttrs, &priParam);
+    ret |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
+    if(ret != 0) while(1);
 
-    pthread_attr_setschedparam(&pAttrs, &priParam);
-
-    retc |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
-    if(retc != 0) while(1);
-
-    retc = pthread_create(&application, &pAttrs, at_01_thread, NULL);
-    if(retc != 0) while(1);
+    ret = pthread_create(NULL, &pAttrs, at_01_thread, NULL);
+    if(ret != 0) while(1);
 
     BIOS_start();
 

@@ -1,3 +1,16 @@
+
+#include "board.h"
+
+#include "buzzer.h"
+#include "drum.h"
+#include "flash.h"
+#include "leds.h"
+#include "pin_map.h"
+#include "sensor.h"
+#include "shutter.h"
+#include "uart_term.h"
+
+#include <pthread.h>
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
@@ -19,26 +32,27 @@
 #include <ti/devices/cc32xx/driverlib/udma.h>
 #include <ti/devices/cc32xx/driverlib/wdt.h>
 
+#include <ti/drivers/ADC.h>
+#include <ti/drivers/adc/ADCCC32XX.h>
+#include <ti/drivers/dma/UDMACC32XX.h>
+#include <ti/drivers/GPIO.h>
+#include <ti/drivers/gpio/GPIOCC32XX.h>
 #include <ti/drivers/Power.h>
 #include <ti/drivers/power/PowerCC32XX.h>
+#include <ti/drivers/PWM.h>
+#include <ti/drivers/pwm/PWMTimerCC32XX.h>
+#include <ti/drivers/SPI.h>
+#include <ti/drivers/spi/SPICC32XXDMA.h>
+#include <ti/drivers/Timer.h>
+#include <ti/drivers/timer/TimerCC32XX.h>
+#include <ti/drivers/UART.h>
+#include <ti/drivers/uart/UARTCC32XX.h>
 
-#include "board.h"
-#include "pin_map.h"
-
-/*
- *  This define determines whether to use the UARTCC32XXDMA driver
- *  or the UARTCC32XX (no DMA) driver.  Set to 1 to use the UARTCC32XXDMA
- *  driver.
- */
-#ifndef TI_DRIVERS_UART_DMA
-#define TI_DRIVERS_UART_DMA 0
-#endif
+#include <ti/drivers/net/wifi/simplelink.h>
 
 /*
  *  =============================== ADC ===============================
  */
-#include <ti/drivers/ADC.h>
-#include <ti/drivers/adc/ADCCC32XX.h>
 
 ADCCC32XX_Object adcCC3220SObjects[BOARD_ADC_COUNT];
 
@@ -67,59 +81,8 @@ const ADC_Config ADC_config[BOARD_ADC_COUNT] = {
 const uint_least8_t ADC_count = BOARD_ADC_COUNT;
 
 /*
- *  =============================== Capture ===============================
- */
-#include <ti/drivers/Capture.h>
-#include <ti/drivers/capture/CaptureCC32XX.h>
-
-CaptureCC32XX_Object captureCC3220SObjects[CC3220S_LAUNCHXL_CAPTURECOUNT];
-
-const CaptureCC32XX_HWAttrs captureCC3220SHWAttrs[CC3220S_LAUNCHXL_CAPTURECOUNT] =
-{
-      {
-         .capturePin = CaptureCC32XX_PIN_04,
-         .intPriority = ~0
-      },
-      {
-          .capturePin = CaptureCC32XX_PIN_05,
-          .intPriority = ~0
-      },
-};
-
-const Capture_Config Capture_config[CC3220S_LAUNCHXL_CAPTURECOUNT] = {
-    {
-        .fxnTablePtr = &CaptureCC32XX_fxnTable,
-        .object = &captureCC3220SObjects[CC3220S_LAUNCHXL_CAPTURE0],
-        .hwAttrs = &captureCC3220SHWAttrs[CC3220S_LAUNCHXL_CAPTURE0]
-    },
-    {
-        .fxnTablePtr = &CaptureCC32XX_fxnTable,
-        .object = &captureCC3220SObjects[CC3220S_LAUNCHXL_CAPTURE1],
-        .hwAttrs = &captureCC3220SHWAttrs[CC3220S_LAUNCHXL_CAPTURE1]
-    }
-};
-
-const uint_least8_t Capture_count = CC3220S_LAUNCHXL_CAPTURECOUNT;
-
-/*
- *  =============================== Crypto ===============================
- */
-#include <ti/drivers/crypto/CryptoCC32XX.h>
-
-CryptoCC32XX_Object cryptoCC3220SObjects[CC3220S_LAUNCHXL_CRYPTOCOUNT];
-
-const CryptoCC32XX_Config CryptoCC32XX_config[CC3220S_LAUNCHXL_CRYPTOCOUNT] = {
-    {
-        .object = &cryptoCC3220SObjects[CC3220S_LAUNCHXL_CRYPTO0]
-    }
-};
-
-const uint_least8_t CryptoCC32XX_count = CC3220S_LAUNCHXL_CRYPTOCOUNT;
-
-/*
  *  =============================== DMA ===============================
  */
-#include <ti/drivers/dma/UDMACC32XX.h>
 
 static tDMAControlTable dmaControlTable[64] __attribute__ ((aligned (1024)));
 
@@ -153,22 +116,8 @@ const UDMACC32XX_Config UDMACC32XX_config = {
 };
 
 /*
- *  =============================== General ===============================
- */
-/*
- *  ======== CC3220S_LAUNCHXL_initGeneral ========
- */
-void board_init(void)
-{
-    PRCMCC3200MCUInit();
-    Power_init();
-}
-
-/*
  *  =============================== GPIO ===============================
  */
-#include <ti/drivers/GPIO.h>
-#include <ti/drivers/gpio/GPIOCC32XX.h>
 
 /*
  * Array of Pin configurations
@@ -181,12 +130,12 @@ void board_init(void)
 GPIO_PinConfig gpioPinConfigs[] = {
     /* pins with callbacks first */
     BOARD_GPIO_BUTTON_PATIENT_PIN | GPIO_CFG_INPUT | GPIO_CFG_IN_INT_RISING,
+    BOARD_GPIO_BUTTON_RESET_PIN | GPIO_CFG_INPUT,
 
     /* pins without callbacks */
     BOARD_GPIO_LED_STATUS_PIN | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
     BOARD_GPIO_LED_ERROR_PIN | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
     BOARD_GPIO_LED_CONNECTION_PIN | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
-    BOARD_GPIO_BUTTON_RESET_PIN | GPIO_CFG_INPUT,
     BOARD_SENSOR_HIGH_PIN | GPIO_CFG_INPUT,
     BOARD_SENSOR_LOW_PIN | GPIO_CFG_INPUT,
     BOARD_BUZZER_PIN | GPIO_CFG_OUT_STD | GPIO_CFG_OUT_STR_HIGH | GPIO_CFG_OUT_LOW,
@@ -221,67 +170,6 @@ const GPIOCC32XX_Config GPIOCC32XX_config = {
     .numberOfCallbacks = sizeof(gpioCallbackFunctions)/sizeof(GPIO_CallbackFxn),
     .intPriority = (~0)
 };
-
-/*
- *  =============================== I2C ===============================
- */
-#include <ti/drivers/I2C.h>
-#include <ti/drivers/i2c/I2CCC32XX.h>
-
-I2CCC32XX_Object i2cCC3220SObjects[CC3220S_LAUNCHXL_I2CCOUNT];
-
-const I2CCC32XX_HWAttrsV1 i2cCC3220SHWAttrs[CC3220S_LAUNCHXL_I2CCOUNT] = {
-    {
-        .baseAddr = I2CA0_BASE,
-        .intNum = INT_I2CA0,
-        .intPriority = (~0),
-        .clkPin = I2CCC32XX_PIN_01_I2C_SCL,
-        .dataPin = I2CCC32XX_PIN_02_I2C_SDA
-    }
-};
-
-const I2C_Config I2C_config[CC3220S_LAUNCHXL_I2CCOUNT] = {
-    {
-        .fxnTablePtr = &I2CCC32XX_fxnTable,
-        .object = &i2cCC3220SObjects[CC3220S_LAUNCHXL_I2C0],
-        .hwAttrs = &i2cCC3220SHWAttrs[CC3220S_LAUNCHXL_I2C0]
-    }
-};
-
-const uint_least8_t I2C_count = CC3220S_LAUNCHXL_I2CCOUNT;
-
-/*
- *  =============================== I2S ===============================
- */
-#include <ti/drivers/I2S.h>
-#include <ti/drivers/i2s/I2SCC32XXDMA.h>
-
-I2SCC32XXDMA_Object i2sCC3220SObjects[CC3220S_LAUNCHXL_I2SCOUNT];
-
-const I2SCC32XXDMA_HWAttrsV1 i2sCC3220SHWAttrs[CC3220S_LAUNCHXL_I2SCOUNT] = {
-    {
-        .baseAddr = I2S_BASE,
-        .intNum = INT_I2S,
-        .intPriority = (~0),
-        .rxChannelIndex = UDMA_CH4_I2S_RX,
-        .txChannelIndex = UDMA_CH5_I2S_TX,
-        .xr0Pin = I2SCC32XXDMA_PIN_64_McAXR0,
-        .xr1Pin = I2SCC32XXDMA_PIN_50_McAXR1,
-        .clkxPin = I2SCC32XXDMA_PIN_62_McACLKX,
-        .clkPin = I2SCC32XXDMA_PIN_53_McACLK,
-        .fsxPin = I2SCC32XXDMA_PIN_63_McAFSX,
-    }
-};
-
-const I2S_Config I2S_config[CC3220S_LAUNCHXL_I2SCOUNT] = {
-    {
-        .fxnTablePtr = &I2SCC32XXDMA_fxnTable,
-        .object = &i2sCC3220SObjects[CC3220S_LAUNCHXL_I2S0],
-        .hwAttrs = &i2sCC3220SHWAttrs[CC3220S_LAUNCHXL_I2S0]
-    }
-};
-
-const uint_least8_t I2S_count = CC3220S_LAUNCHXL_I2SCOUNT;
 
 /*
  *  =============================== Power ===============================
@@ -365,8 +253,6 @@ const PowerCC32XX_ConfigV1 PowerCC32XX_config = {
 /*
  *  =============================== PWM ===============================
  */
-#include <ti/drivers/PWM.h>
-#include <ti/drivers/pwm/PWMTimerCC32XX.h>
 
 PWMTimerCC32XX_Object pwmTimerCC3220SObjects[BOARD_PWM_COUNT];
 
@@ -386,75 +272,16 @@ const PWM_Config PWM_config[BOARD_PWM_COUNT] = {
 
 const uint_least8_t PWM_count = BOARD_PWM_COUNT;
 
-/*
- *  =============================== SDFatFS ===============================
- */
-#include <ti/drivers/SD.h>
-#include <ti/drivers/SDFatFS.h>
-
-/*
- * Note: The SDFatFS driver provides interface functions to enable FatFs
- * but relies on the SD driver to communicate with SD cards.  Opening a
- * SDFatFs driver instance will internally try to open a SD driver instance
- * reusing the same index number (opening SDFatFs driver at index 0 will try to
- * open SD driver at index 0).  This requires that all SDFatFs driver instances
- * have an accompanying SD driver instance defined with the same index.  It is
- * acceptable to have more SD driver instances than SDFatFs driver instances
- * but the opposite is not supported & the SDFatFs will fail to open.
- */
-SDFatFS_Object sdfatfsObjects[CC3220S_LAUNCHXL_SDFatFSCOUNT];
-
-const SDFatFS_Config SDFatFS_config[CC3220S_LAUNCHXL_SDFatFSCOUNT] = {
-    {
-        .object = &sdfatfsObjects[CC3220S_LAUNCHXL_SDFatFS0]
-    }
-};
-
-const uint_least8_t SDFatFS_count = CC3220S_LAUNCHXL_SDFatFSCOUNT;
-
-/*
- *  =============================== SD ===============================
- */
-#include <ti/drivers/SD.h>
-#include <ti/drivers/sd/SDHostCC32XX.h>
-
-SDHostCC32XX_Object sdhostCC3220SObjects[CC3220S_LAUNCHXL_SDCOUNT];
-
-/* SDHost configuration structure, describing which pins are to be used */
-const SDHostCC32XX_HWAttrsV1 sdhostCC3220SHWattrs[CC3220S_LAUNCHXL_SDCOUNT] = {
-    {
-        .clkRate = 8000000,
-        .intPriority = ~0,
-        .baseAddr = SDHOST_BASE,
-        .rxChIdx = UDMA_CH23_SDHOST_RX,
-        .txChIdx = UDMA_CH24_SDHOST_TX,
-        .dataPin = SDHostCC32XX_PIN_06_SDCARD_DATA,
-        .cmdPin = SDHostCC32XX_PIN_08_SDCARD_CMD,
-        .clkPin = SDHostCC32XX_PIN_07_SDCARD_CLK
-    }
-};
-
-const SD_Config SD_config[CC3220S_LAUNCHXL_SDCOUNT] = {
-    {
-        .fxnTablePtr = &sdHostCC32XX_fxnTable,
-        .object = &sdhostCC3220SObjects[CC3220S_LAUNCHXL_SD0],
-        .hwAttrs = &sdhostCC3220SHWattrs[CC3220S_LAUNCHXL_SD0]
-    },
-};
-
-const uint_least8_t SD_count = CC3220S_LAUNCHXL_SDCOUNT;
 
 /*
  *  =============================== SPI ===============================
  */
-#include <ti/drivers/SPI.h>
-#include <ti/drivers/spi/SPICC32XXDMA.h>
 
-SPICC32XXDMA_Object spiCC3220SDMAObjects[CC3220S_LAUNCHXL_SPICOUNT];
+SPICC32XXDMA_Object spiCC3220SDMAObjects[BOARD_SPI_COUNT];
 
-uint32_t spiCC3220SDMAscratchBuf[CC3220S_LAUNCHXL_SPICOUNT];
+uint32_t spiCC3220SDMAscratchBuf[BOARD_SPI_COUNT];
 
-const SPICC32XXDMA_HWAttrsV1 spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPICOUNT] = {
+const SPICC32XXDMA_HWAttrsV1 spiCC3220SDMAHWAttrs[BOARD_SPI_COUNT] = {
     /* index 0 is reserved for LSPI that links to the NWP */
     {
         .baseAddr = LSPI_BASE,
@@ -465,7 +292,7 @@ const SPICC32XXDMA_HWAttrsV1 spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPICOUNT] = {
         .csPolarity = SPI_CS_ACTIVEHIGH,
         .pinMode = SPI_4PIN_MODE,
         .turboMode = SPI_TURBO_OFF,
-        .scratchBufPtr = &spiCC3220SDMAscratchBuf[CC3220S_LAUNCHXL_SPI0],
+        .scratchBufPtr = &spiCC3220SDMAscratchBuf[BOARD_SPI0],
         .defaultTxBufValue = 0,
         .rxChannelIndex = UDMA_CH12_LSPI_RX,
         .txChannelIndex = UDMA_CH13_LSPI_TX,
@@ -484,7 +311,7 @@ const SPICC32XXDMA_HWAttrsV1 spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPICOUNT] = {
         .csPolarity = SPI_CS_ACTIVELOW,
         .pinMode = SPI_4PIN_MODE,
         .turboMode = SPI_TURBO_OFF,
-        .scratchBufPtr = &spiCC3220SDMAscratchBuf[CC3220S_LAUNCHXL_SPI1],
+        .scratchBufPtr = &spiCC3220SDMAscratchBuf[BOARD_SPI1],
         .defaultTxBufValue = 0,
         .rxChannelIndex = UDMA_CH6_GSPI_RX,
         .txChannelIndex = UDMA_CH7_GSPI_TX,
@@ -496,30 +323,28 @@ const SPICC32XXDMA_HWAttrsV1 spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPICOUNT] = {
     }
 };
 
-const SPI_Config SPI_config[CC3220S_LAUNCHXL_SPICOUNT] = {
+const SPI_Config SPI_config[BOARD_SPI_COUNT] = {
     {
         .fxnTablePtr = &SPICC32XXDMA_fxnTable,
-        .object = &spiCC3220SDMAObjects[CC3220S_LAUNCHXL_SPI0],
-        .hwAttrs = &spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPI0]
+        .object = &spiCC3220SDMAObjects[BOARD_SPI0],
+        .hwAttrs = &spiCC3220SDMAHWAttrs[BOARD_SPI0]
     },
     {
         .fxnTablePtr = &SPICC32XXDMA_fxnTable,
-        .object = &spiCC3220SDMAObjects[CC3220S_LAUNCHXL_SPI1],
-        .hwAttrs = &spiCC3220SDMAHWAttrs[CC3220S_LAUNCHXL_SPI1]
+        .object = &spiCC3220SDMAObjects[BOARD_SPI1],
+        .hwAttrs = &spiCC3220SDMAHWAttrs[BOARD_SPI1]
     }
 };
 
-const uint_least8_t SPI_count = CC3220S_LAUNCHXL_SPICOUNT;
+const uint_least8_t SPI_count = BOARD_SPI_COUNT;
 
 /*
  *  =============================== Timer ===============================
  */
-#include <ti/drivers/Timer.h>
-#include <ti/drivers/timer/TimerCC32XX.h>
 
-TimerCC32XX_Object timerCC3220SObjects[CC3220S_LAUNCHXL_TIMERCOUNT];
+TimerCC32XX_Object timerCC3220SObjects[BOARD_TIMER_COUNT];
 
-const TimerCC32XX_HWAttrs timerCC3220SHWAttrs[CC3220S_LAUNCHXL_TIMERCOUNT] = {
+const TimerCC32XX_HWAttrs timerCC3220SHWAttrs[BOARD_TIMER_COUNT] = {
     {
         .baseAddress = TIMERA0_BASE,
         .subTimer = TimerCC32XX_timer32,
@@ -540,93 +365,42 @@ const TimerCC32XX_HWAttrs timerCC3220SHWAttrs[CC3220S_LAUNCHXL_TIMERCOUNT] = {
     },
 };
 
-const Timer_Config Timer_config[CC3220S_LAUNCHXL_TIMERCOUNT] = {
+const Timer_Config Timer_config[BOARD_TIMER_COUNT] = {
     {
         .fxnTablePtr = &TimerCC32XX_fxnTable,
-        .object = &timerCC3220SObjects[CC3220S_LAUNCHXL_TIMER0],
-        .hwAttrs = &timerCC3220SHWAttrs[CC3220S_LAUNCHXL_TIMER0]
+        .object = &timerCC3220SObjects[BOARD_TIMER0],
+        .hwAttrs = &timerCC3220SHWAttrs[BOARD_TIMER0]
     },
     {
         .fxnTablePtr = &TimerCC32XX_fxnTable,
-        .object = &timerCC3220SObjects[CC3220S_LAUNCHXL_TIMER1],
-        .hwAttrs = &timerCC3220SHWAttrs[CC3220S_LAUNCHXL_TIMER1]
+        .object = &timerCC3220SObjects[BOARD_TIMER1],
+        .hwAttrs = &timerCC3220SHWAttrs[BOARD_TIMER1]
     },
     {
         .fxnTablePtr = &TimerCC32XX_fxnTable,
-        .object = &timerCC3220SObjects[CC3220S_LAUNCHXL_TIMER2],
-        .hwAttrs = &timerCC3220SHWAttrs[CC3220S_LAUNCHXL_TIMER2]
+        .object = &timerCC3220SObjects[BOARD_TIMER2],
+        .hwAttrs = &timerCC3220SHWAttrs[BOARD_TIMER2]
     },
 };
 
-const uint_least8_t Timer_count = CC3220S_LAUNCHXL_TIMERCOUNT;
+const uint_least8_t Timer_count = BOARD_TIMER_COUNT;
 
 /*
  *  =============================== UART ===============================
  */
-#include <ti/drivers/UART.h>
-#if TI_DRIVERS_UART_DMA
-#include <ti/drivers/uart/UARTCC32XXDMA.h>
 
-UARTCC32XXDMA_Object uartCC3220SDmaObjects[CC3220S_LAUNCHXL_UARTCOUNT];
+UARTCC32XX_Object uartCC3220SObjects[BOARD_UART_COUNT];
+unsigned char uartCC3220SRingBuffer[BOARD_UART_COUNT][32];
 
 /* UART configuration structure */
-const UARTCC32XXDMA_HWAttrsV1 uartCC3220SDmaHWAttrs[CC3220S_LAUNCHXL_UARTCOUNT] = {
-    {
-        .baseAddr = UARTA0_BASE,
-        .intNum = INT_UARTA0,
-        .intPriority = (~0),
-        .flowControl = UARTCC32XXDMA_FLOWCTRL_NONE,
-        .rxChannelIndex = UDMA_CH8_UARTA0_RX,
-        .txChannelIndex = UDMA_CH9_UARTA0_TX,
-        .rxPin = UARTCC32XXDMA_PIN_57_UART0_RX,
-        .txPin = UARTCC32XXDMA_PIN_55_UART0_TX,
-        .ctsPin = UARTCC32XXDMA_PIN_UNASSIGNED,
-        .rtsPin = UARTCC32XXDMA_PIN_UNASSIGNED,
-        .errorFxn = NULL
-    },
-    {
-        .baseAddr = UARTA1_BASE,
-        .intNum = INT_UARTA1,
-        .intPriority = (~0),
-        .flowControl = UARTCC32XXDMA_FLOWCTRL_NONE,
-        .rxChannelIndex = UDMA_CH10_UARTA1_RX,
-        .txChannelIndex = UDMA_CH11_UARTA1_TX,
-        .rxPin = UARTCC32XXDMA_PIN_08_UART1_RX,
-        .txPin = UARTCC32XXDMA_PIN_07_UART1_TX,
-        .ctsPin = UARTCC32XXDMA_PIN_UNASSIGNED,
-        .rtsPin = UARTCC32XXDMA_PIN_UNASSIGNED,
-        .errorFxn = NULL
-    }
-};
-
-const UART_Config UART_config[CC3220S_LAUNCHXL_UARTCOUNT] = {
-    {
-        .fxnTablePtr = &UARTCC32XXDMA_fxnTable,
-        .object = &uartCC3220SDmaObjects[CC3220S_LAUNCHXL_UART0],
-        .hwAttrs = &uartCC3220SDmaHWAttrs[CC3220S_LAUNCHXL_UART0]
-    },
-    {
-        .fxnTablePtr = &UARTCC32XXDMA_fxnTable,
-        .object = &uartCC3220SDmaObjects[CC3220S_LAUNCHXL_UART1],
-        .hwAttrs = &uartCC3220SDmaHWAttrs[CC3220S_LAUNCHXL_UART1]
-    }
-};
-
-#else
-#include <ti/drivers/uart/UARTCC32XX.h>
-
-UARTCC32XX_Object uartCC3220SObjects[CC3220S_LAUNCHXL_UARTCOUNT];
-unsigned char uartCC3220SRingBuffer[CC3220S_LAUNCHXL_UARTCOUNT][32];
-
-/* UART configuration structure */
-const UARTCC32XX_HWAttrsV1 uartCC3220SHWAttrs[CC3220S_LAUNCHXL_UARTCOUNT] = {
+const UARTCC32XX_HWAttrsV1 uartCC3220SHWAttrs[BOARD_UART_COUNT] = {
     {
         .baseAddr = UARTA0_BASE,
         .intNum = INT_UARTA0,
         .intPriority = (~0),
         .flowControl = UARTCC32XX_FLOWCTRL_NONE,
-        .ringBufPtr  = uartCC3220SRingBuffer[CC3220S_LAUNCHXL_UART0],
-        .ringBufSize = sizeof(uartCC3220SRingBuffer[CC3220S_LAUNCHXL_UART0]),
+        .ringBufPtr  = uartCC3220SRingBuffer[BOARD_UART0],
+        .ringBufSize = sizeof(uartCC3220SRingBuffer[BOARD_UART0]),
         .rxPin = UARTCC32XX_PIN_57_UART0_RX,
         .txPin = UARTCC32XX_PIN_55_UART0_TX,
         .ctsPin = UARTCC32XX_PIN_UNASSIGNED,
@@ -638,8 +412,8 @@ const UARTCC32XX_HWAttrsV1 uartCC3220SHWAttrs[CC3220S_LAUNCHXL_UARTCOUNT] = {
         .intNum = INT_UARTA1,
         .intPriority = (~0),
         .flowControl = UARTCC32XX_FLOWCTRL_NONE,
-        .ringBufPtr  = uartCC3220SRingBuffer[CC3220S_LAUNCHXL_UART1],
-        .ringBufSize = sizeof(uartCC3220SRingBuffer[CC3220S_LAUNCHXL_UART1]),
+        .ringBufPtr  = uartCC3220SRingBuffer[BOARD_UART1],
+        .ringBufSize = sizeof(uartCC3220SRingBuffer[BOARD_UART1]),
         .rxPin = UARTCC32XX_PIN_08_UART1_RX,
         .txPin = UARTCC32XX_PIN_07_UART1_TX,
         .ctsPin = UARTCC32XX_PIN_UNASSIGNED,
@@ -648,45 +422,70 @@ const UARTCC32XX_HWAttrsV1 uartCC3220SHWAttrs[CC3220S_LAUNCHXL_UARTCOUNT] = {
     }
 };
 
-const UART_Config UART_config[CC3220S_LAUNCHXL_UARTCOUNT] = {
+const UART_Config UART_config[BOARD_UART_COUNT] = {
     {
         .fxnTablePtr = &UARTCC32XX_fxnTable,
-        .object = &uartCC3220SObjects[CC3220S_LAUNCHXL_UART0],
-        .hwAttrs = &uartCC3220SHWAttrs[CC3220S_LAUNCHXL_UART0]
+        .object = &uartCC3220SObjects[BOARD_UART0],
+        .hwAttrs = &uartCC3220SHWAttrs[BOARD_UART0]
     },
     {
         .fxnTablePtr = &UARTCC32XX_fxnTable,
-        .object = &uartCC3220SObjects[CC3220S_LAUNCHXL_UART1],
-        .hwAttrs = &uartCC3220SHWAttrs[CC3220S_LAUNCHXL_UART1]
+        .object = &uartCC3220SObjects[BOARD_UART1],
+        .hwAttrs = &uartCC3220SHWAttrs[BOARD_UART1]
     }
 };
-#endif /* TI_DRIVERS_UART_DMA */
 
-const uint_least8_t UART_count = CC3220S_LAUNCHXL_UARTCOUNT;
+const uint_least8_t UART_count = BOARD_UART_COUNT;
 
 /*
- *  =============================== Watchdog ===============================
+ *  ============================ Init Functions ============================
  */
-#include <ti/drivers/Watchdog.h>
-#include <ti/drivers/watchdog/WatchdogCC32XX.h>
 
-WatchdogCC32XX_Object watchdogCC3220SObjects[CC3220S_LAUNCHXL_WATCHDOGCOUNT];
+void hardware_init()
+{
+    PRCMCC3200MCUInit();
+    Power_init();
 
-const WatchdogCC32XX_HWAttrs watchdogCC3220SHWAttrs[CC3220S_LAUNCHXL_WATCHDOGCOUNT] = {
-    {
-        .baseAddr = WDT_BASE,
-        .intNum = INT_WDT,
-        .intPriority = (~0),
-        .reloadValue = 80000000 /* 1 second period at default CPU clock freq */
-    }
-};
+    GPIO_init();
+    SPI_init();
 
-const Watchdog_Config Watchdog_config[CC3220S_LAUNCHXL_WATCHDOGCOUNT] = {
-    {
-        .fxnTablePtr = &WatchdogCC32XX_fxnTable,
-        .object = &watchdogCC3220SObjects[CC3220S_LAUNCHXL_WATCHDOG0],
-        .hwAttrs = &watchdogCC3220SHWAttrs[CC3220S_LAUNCHXL_WATCHDOG0]
-    }
-};
+    shutter_init();
+    drum_init();
 
-const uint_least8_t Watchdog_count = CC3220S_LAUNCHXL_WATCHDOGCOUNT;
+    buzzer_init();
+    leds_init();
+
+    InitTerm();
+}
+
+#define TASK_STACK_SIZE (2048)
+
+void dummy_function(_u32 Status, SlDeviceInitInfo_t *DeviceInitInfo) { }
+
+void software_init()
+{
+    pthread_attr_t pAttrs;
+    struct sched_param priParam;
+    int ret;
+    int detachState;
+
+    pthread_attr_init(&pAttrs);
+    priParam.sched_priority = 1;
+
+    detachState = PTHREAD_CREATE_DETACHED;
+    ret = pthread_attr_setdetachstate(&pAttrs, detachState);
+    if(ret != 0) while(1);
+
+    pthread_attr_setschedparam(&pAttrs, &priParam);
+
+    ret |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
+    if(ret != 0) while(1);
+
+//    ret = pthread_create(NULL, &pAttrs, sl_Task, NULL);
+//    if(ret != 0) while(1);
+
+//    ret = sl_Start(NULL, NULL, NULL); //dummy_function);
+//    if(ret < 0) while(1);
+
+//    configuration_init();
+}

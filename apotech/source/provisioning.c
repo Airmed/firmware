@@ -849,8 +849,8 @@ void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer)
 //*****************************************************************************
 void FactoryIndicationLed(void)
 {
-    GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
-    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
+    GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_OFF);
+    GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_ON);
     gLedState = 0;
 
     while(1)
@@ -862,14 +862,14 @@ void FactoryIndicationLed(void)
         {
             if(gLedState)
             {
-                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
-                GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
+                GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_OFF);
+                GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_ON);
                 gLedState = 0;
             }
             else
             {
-                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_ON);
-                GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
+                GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_ON);
+                GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_OFF);
                 gLedState = 1;
             }
         }
@@ -887,7 +887,7 @@ void FactoryIndicationLed(void)
 //*****************************************************************************
 void ErrorLedDisplay(void)
 {
-    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
+    GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_OFF);
     gErrLedState = 0;
 
     while(1)
@@ -899,12 +899,12 @@ void ErrorLedDisplay(void)
         {
             if(gErrLedState)
             {
-                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
+                GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_OFF);
                 gErrLedState = 0;
             }
             else
             {
-                GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_ON);
+                GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_ON);
                 gErrLedState = 1;
             }
         }
@@ -938,7 +938,7 @@ void * UpdateLedDisplay(void *arg)
             {
                 if(0 == gLedState)
                 {
-                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_ON);
                     gLedState = 1;
                 }
             }
@@ -946,12 +946,12 @@ void * UpdateLedDisplay(void *arg)
             {
                 if(gLedState)
                 {
-                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_OFF);
                     gLedState = 0;
                 }
                 else
                 {
-                    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_ON);
+                    GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_ON);
                     gLedState = 1;
                 }
             }
@@ -1839,6 +1839,7 @@ void * ProvisioningTask(void *arg)
     timer_create(CLOCK_MONOTONIC, &sev, &gTimer);
 
     /* Initialize Simple Link */
+//    sl_Stop(SL_STOP_TIMEOUT);
     if((iRetVal =
             sl_Start(NULL, NULL, (P_INIT_CALLBACK)SimpleLinkInitCallback)) < 0)
     {
@@ -1917,95 +1918,6 @@ static void DisplayBanner(char * AppName)
 //! \return none
 //!
 //*****************************************************************************
-#if 0
-void * provisioning_thread( void *arg )
-{
-    //LOG_MESSAGE("Provisioning Thread Called");
-    uint32_t             RetVal;
-    pthread_attr_t      pAttrs;
-    pthread_attr_t      pAttrs_spawn;
-    pthread_attr_t      pAttrs_display;
-    struct sched_param  priParam;
-
-    GPIO_init();
-    SPI_init();
-
-    /* Initial Terminal, and print Application name */
-    InitTerm();
-    DisplayBanner(APPLICATION_NAME);
-
-    /* Switch off all LEDs on boards */
-    GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
-    GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
-
-    /* create the sl_Task */
-    pthread_attr_init(&pAttrs_spawn);
-    priParam.sched_priority = SPAWN_TASK_PRIORITY;
-    RetVal = pthread_attr_setschedparam(&pAttrs_spawn, &priParam);
-    RetVal |= pthread_attr_setstacksize(&pAttrs_spawn, TASK_STACK_SIZE);
-    RetVal = pthread_create(&gSpawnThread, &pAttrs_spawn, sl_Task, NULL);
-    if(RetVal)
-    {
-        while(1)
-        {
-            ;
-        }
-    }
-    pthread_attr_init(&pAttrs);
-    priParam.sched_priority = 1;
-    RetVal = pthread_attr_setschedparam(&pAttrs, &priParam);
-    RetVal |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
-
-    if(RetVal)
-    {
-        /* error handling */
-        while(1)
-        {
-            ;
-        }
-    }
-
-    RetVal = pthread_create(&gProvisioningThread, &pAttrs, ProvisioningTask,
-                            NULL);
-    if(RetVal)
-    {
-        while(1)
-        {
-            ;
-        }
-    }
-
-    /* create led display thread */
-    pthread_attr_init(&pAttrs_display);
-    priParam.sched_priority = 5;
-    RetVal = pthread_attr_setschedparam(&pAttrs_display, &priParam);
-    RetVal |= pthread_attr_setstacksize(&pAttrs_display,
-                                        DISPLAY_TASK_STACK_SIZE);
-
-    if(RetVal)
-    {
-        /* error handling */
-        while(1)
-        {
-            ;
-        }
-    }
-
-    RetVal = pthread_create(&gDisplayThread, &pAttrs_display, UpdateLedDisplay,
-                            NULL);
-
-    if(RetVal)
-    {
-        while(1)
-        {
-            ;
-        }
-    }
-
-    return(0);
-}
-#endif
-
 void * provisioning_task( void *arg )
 {
     uint32_t             RetVal;
@@ -2014,17 +1926,17 @@ void * provisioning_task( void *arg )
     pthread_attr_t      pAttrs_display;
     struct sched_param  priParam;
 
+//    GPIO_init();
+//    SPI_init();
+//
+//    /* Initial Terminal, and print Application name */
+//    InitTerm();
 
-    GPIO_init();
-    SPI_init();
-
-    /* Initial Terminal, and print Application name */
-    InitTerm();
     DisplayBanner(APPLICATION_NAME);
 
     /* Switch off all LEDs on boards */
-        GPIO_write(BOARD_GPIO_LED_CONNECTION, Board_GPIO_LED_OFF);
-        GPIO_write(BOARD_GPIO_LED_ERROR, Board_GPIO_LED_OFF);
+        GPIO_write(BOARD_GPIO_LED_CONNECTION, BOARD_PIN_OFF);
+        GPIO_write(BOARD_GPIO_LED_ERROR, BOARD_PIN_OFF);
 
     /* create the sl_Task */
     pthread_attr_init(&pAttrs_spawn);

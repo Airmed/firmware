@@ -54,7 +54,7 @@
 #define LOG_MESSAGE UART_PRINT
 
 
-const char header[] = "Basic dZdDpXGVz0N0\r\nContent-Type: application/json";
+char header[] = "Basic dZdDpXGVz0N0\r\nContent-Type: application/json";
 extern Display_Handle display;
 extern sem_t ipEventSyncObj;
 extern void printError(char *errString,

@@ -1,258 +1,40 @@
-/*
- * Copyright (c) 2016, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
 
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*
- *  ======== main_tirtos.c ========
- */
-#if 0
-#include <stdint.h>
-
-/* POSIX Header files */
-#include <pthread.h>
-
-/* RTOS header files */
-#include <ti/sysbios/BIOS.h>
-
-/* TI-RTOS Header files */
-#include <ti/drivers/GPIO.h>
-
-/* Example/Board Header files */
 #include "board.h"
 
-#include <uart_term.h>
-#define LOG_MESSAGE UART_PRINT
-
-extern void * provisioning_thread(void * arg0);
-extern void * application_thread(void * arg0);
-//extern void * mainThread(void *arg0);
-extern void * it_02_thread(void * arg0);
-extern void * it_03_thread(void * arg0);
-
-
-/* Stack size in bytes */
-#define THREADSTACKSIZE    4096
-
-/*
- *  ======== main ========
- */
-
-int main(void)
-{
-    pthread_t provisioning, application, httpget;
-    pthread_attr_t pAttrs;
-    struct sched_param priParam;
-    int retc;
-    int detachState;
-
-    /* Call board init functions */
-    board_init();
-
-    LOG_MESSAGE("In main\n");
-
-    /* Set priority and stack size attributes */
-    pthread_attr_init(&pAttrs);
-    priParam.sched_priority = 1;
-
-    detachState = PTHREAD_CREATE_DETACHED;
-    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
-    if(retc != 0) while(1);
-
-    pthread_attr_setschedparam(&pAttrs, &priParam);
-
-    retc |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
-    if(retc != 0) while(1);
-
-    retc = pthread_create(&provisioning, &pAttrs, provisioning_thread, NULL);
-    if(retc != 0) while(1);
-
-    //retc = pthread_create(&httpget, &pAttrs, mainThread, NULL);
-    //   if(retc != 0) while(1);
-
-    GPIO_init();
-
-#if !defined(IT_02) && !defined(IT_03)
-    retc = pthread_create(&application, &pAttrs, application_thread, NULL);
-    if(retc != 0) while(1);
-#elif  defined(IT_02)
-    retc = pthread_create(&application, &pAttrs, it_02_thread, NULL);
-    if(retc != 0) while(1);
-#elif defined(IT_03)
-    retc = pthread_create(&application, &pAttrs, it_03_thread, NULL);
-    if(retc != 0) while(1);
-#endif
-
-    BIOS_start();
-
-    return (0);
-}
-
-/*
- *  ======== dummyOutput ========
- *  Dummy SysMin output function needed for benchmarks and size comparison
- *  of FreeRTOS and TI-RTOS solutions.
- */
-void dummyOutput(void)
-{
-}
-#endif
-
-/*
- * Copyright (c) 2016, Texas Instruments Incorporated
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * *  Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * *  Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in the
- *    documentation and/or other materials provided with the distribution.
- *
- * *  Neither the name of Texas Instruments Incorporated nor the names of
- *    its contributors may be used to endorse or promote products derived
- *    from this software without specific prior written permission.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO,
- * THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS;
- * OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY,
-
- * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
- * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE,
- * EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- */
-
-/*
- *  ======== main_tirtos.c ========
- */
-#include <stdint.h>
-
-/* POSIX Header files */
 #include <pthread.h>
-
-/* RTOS header files */
+#include <stdint.h>
+#include <ti/drivers/GPIO.h>
 #include <ti/sysbios/BIOS.h>
 
-/* TI-RTOS Header files */
-#include <ti/drivers/GPIO.h>
-
-/* Example/Board Header files */
-#include "Board.h"
-
 extern void * provisioning_task(void *arg0);
-//extern void * httpTaskPull(void *arg0);
+extern void * application_thread(void *arg0);
 
-/* Stack size in bytes */
-#define THREADSTACKSIZE    4096
+#define THREADSTACKSIZE (4096)
 
-/*
- *  ======== main ========
- */
-int main(void)
+int main()
 {
-    pthread_t provisioning;
     pthread_attr_t pAttrs;
     struct sched_param priParam;
-    int retc;
-    int detachState;
+    int ret;
 
-    /* Call board init functions */
-    board_init();
+    hardware_init();
+    software_init();
 
-
-    /* Set priority and stack size attributes */
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = 1;
 
-    detachState = PTHREAD_CREATE_DETACHED;
-    retc = pthread_attr_setdetachstate(&pAttrs, detachState);
-    if(retc != 0)
-    {
-        /* pthread_attr_setdetachstate() failed */
-        while(1)
-        {
-            ;
-        }
-    }
+    ret = pthread_attr_setdetachstate(&pAttrs, PTHREAD_CREATE_DETACHED);
+    ret |= pthread_attr_setschedparam(&pAttrs, &priParam);
+    ret |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
+    if(ret != 0) while(1);
 
-    pthread_attr_setschedparam(&pAttrs, &priParam);
+    ret = pthread_create(NULL, &pAttrs, provisioning_task, NULL);
+    if(ret != 0) while(1);
 
-    retc |= pthread_attr_setstacksize(&pAttrs, THREADSTACKSIZE);
-    if(retc != 0)
-    {
-        /* pthread_attr_setstacksize() failed */
-        while(1)
-        {
-            ;
-        }
-    }
-
-    retc = pthread_create(&provisioning, &pAttrs, provisioning_task, NULL);
-    if(retc != 0)
-    {
-        /* pthread_create() failed */
-        while(1)
-        {
-            ;
-        }
-    }
-
-    //usleep(10000);
-
-    /* Polling Database */
-    //pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
-    //pthread_create(&http, &pAttrs, httpTaskPull, NULL);
-
-    GPIO_init();
+    ret = pthread_create(NULL, &pAttrs, application_thread, NULL);
+    if(ret != 0) while(1);
 
     BIOS_start();
 
     return (0);
 }
-
-/*
- *  ======== dummyOutput ========
- *  Dummy SysMin output function needed for benchmarks and size comparison
- *  of FreeRTOS and TI-RTOS solutions.
- */
-void dummyOutput(void)
-{
-}
-

@@ -1,17 +1,10 @@
-/*
- *  ======== ti_drivers_net_wifi_Config.c ========
- */
 
-/* TI-DRIVERS Header files */
 #include <ti/drivers/net/wifi/simplelink.h>
 
 /*
  *  =============================== SimpleLink Wifi ===============================
  */
 
-/*
- *  ======== SimpleLinkWifi_config ========
- */
 const SlWifiCC32XXConfig_t SimpleLinkWifiCC32XX_config = {
 
         .Mode = ROLE_STA,
