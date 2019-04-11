@@ -3,6 +3,7 @@
 #include "buttons.h"
 #include "buzzer.h"
 #include "drum.h"
+#include "flash.h"
 #include "sensor.h"
 #include "shutter.h"
 
@@ -14,7 +15,7 @@ void * application_thread(void * arg0)
 {
     while (true)
     {
-        while (button_patient_get_status() == false);
+        while (button_patient_get_status() == false) usleep(1000);
 
         shutter_dispense();
     }

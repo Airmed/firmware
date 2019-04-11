@@ -481,11 +481,11 @@ void software_init()
     ret |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
     if(ret != 0) while(1);
 
-//    ret = pthread_create(NULL, &pAttrs, sl_Task, NULL);
-//    if(ret != 0) while(1);
+    ret = pthread_create(NULL, &pAttrs, sl_Task, NULL);
+    if(ret != 0) while(1);
 
-//    ret = sl_Start(NULL, NULL, NULL); //dummy_function);
-//    if(ret < 0) while(1);
+    ret = sl_Start(NULL, NULL, NULL);
+    if(ret < 0) while(1);
 
-//    configuration_init();
+    configuration_init();
 }

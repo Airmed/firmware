@@ -30,5 +30,6 @@ typedef struct
 void configuration_init();
 configuration_t configuration_read();
 void configuration_write(configuration_t data);
+void configuration_print(configuration_t data);
 
 #endif

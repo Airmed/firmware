@@ -38,10 +38,8 @@
 #include "Board.h"
 #include "pthread.h"
 #include "semaphore.h"
-#include <uart_term.h>
 
-
-#define APPLICATION_NAME                      "Database Integration"
+#define APPLICATION_NAME                      "HTTP GET"
 #define DEVICE_ERROR                          ("Device error, please refer \"DEVICE ERRORS CODES\" section in errors.h")
 #define WLAN_ERROR                            ("WLAN error, please refer \"WLAN ERRORS CODES\" section in errors.h")
 #define SL_STOP_TIMEOUT                       (200)
@@ -51,25 +49,21 @@
 #define SLNET_IF_WIFI_PRIO                    (5)
 #define SLNET_IF_WIFI_NAME                    "CC32xx"
 /* AP SSID */
-#define SSID_NAME                             "Craic Huset"
+#define SSID_NAME                             "Airmed-AT-02"
 
 /* Security type could be SL_WLAN_SEC_TYPE_WPA_WPA2 */      
-#define SECURITY_TYPE                         SL_WLAN_SEC_TYPE_WPA_WPA2 /* SL_WLAN_SEC_TYPE_OPEN */ 
+#define SECURITY_TYPE                         SL_WLAN_SEC_TYPE_OPEN 
 
 /* Password of the secured AP */
-#define SECURITY_KEY                          "kristinakelseysam"
+#define SECURITY_KEY                          "apotech"
 
-#define LOG_MESSAGE UART_PRINT
-
-//pthread_t httpThread = (pthread_t)NULL;
+pthread_t httpThread = (pthread_t)NULL;
 pthread_t spawn_thread = (pthread_t)NULL;
 
 int32_t mode;
 Display_Handle display;
 
-extern void* httpTaskPost(void* pvParameters);
-extern void* httpTaskPull(void* pvParameters);
-extern const char *WlanStatus[];
+extern void* httpTask(void* pvParameters);
 
 /*
  *  ======== printError ========
@@ -106,9 +100,8 @@ void printError(char *errString,
                     guide (SWRU455) section 5.7
 
  */
-void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
+void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
 {
-    LOG_MESSAGE("In SimpleLinkNetAppEventHandlerUnused\n");
     int32_t             status = 0;
     pthread_attr_t      pAttrs;
     struct sched_param  priParam;
@@ -124,7 +117,7 @@ void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
     case SL_NETAPP_EVENT_IPV6_ACQUIRED:
         /* Initialize SlNetSock layer with CC3x20 interface                   */
         SlNetIf_init(0);
-        SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME, 
+        SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME,
                    (const SlNetIf_Config_t *)&SlNetIfConfigWifi,
                     SLNET_IF_WIFI_PRIO);
 
@@ -143,17 +136,12 @@ void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Gateway,1),
                         SL_IPV4_BYTE(pNetAppEvent->Data.IpAcquiredV4.Gateway,0));
 
-
             pthread_attr_init(&pAttrs);
             priParam.sched_priority = 1;
             status = pthread_attr_setschedparam(&pAttrs, &priParam);
             status |= pthread_attr_setstacksize(&pAttrs, TASK_STACK_SIZE);
-            LOG_MESSAGE("Call POST\n");
-            //status = pthread_create(&httpThread, &pAttrs, httpTaskPost, NULL);
-            //pthread_join(&httpThread, NULL);
-            //status = pthread_create(&httpThread, &pAttrs, httpTaskPull, NULL);
 
-
+            status = pthread_create(&httpThread, &pAttrs, httpTask, NULL);
             if(status)
             {
                 printError("Task create failed", status);
@@ -165,6 +153,178 @@ void SimpleLinkNetAppEventHandlerUnused(SlNetAppEvent_t *pNetAppEvent)
     }
 }
 
+/*!
+    \brief          SimpleLinkFatalErrorEventHandler
+
+    This handler gets called whenever a socket event is reported
+    by the NWP / Host driver. After this routine is called, the user's
+    application must restart the device in order to recover.
+
+    \param          slFatalErrorEvent    -   pointer to fatal error event.
+
+    \return         void
+
+    \note           For more information, please refer to: user.h in the porting
+                    folder of the host driver and the  CC31xx/CC32xx NWP
+                    programmer's
+                    guide (SWRU455) section 17.9.
+
+ */
+void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *slFatalErrorEvent)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief          SimpleLinkNetAppRequestMemFreeEventHandler
+
+    This handler gets called whenever the NWP is done handling with
+    the buffer used in a NetApp request. This allows the use of
+    dynamic memory with these requests.
+
+    \param         pNetAppRequest     -   Pointer to NetApp request structure.
+
+    \param         pNetAppResponse    -   Pointer to NetApp request Response.
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx NWP
+                   programmer's
+                   guide (SWRU455) section 17.9.
+
+    \return        void
+
+ */
+void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief         SimpleLinkNetAppRequestEventHandler
+
+    This handler gets called whenever a NetApp event is reported
+    by the NWP / Host driver. User can write he's logic to handle
+    the event here.
+
+    \param         pNetAppRequest     -   Pointer to NetApp request structure.
+
+    \param         pNetAppResponse    -   Pointer to NetApp request Response.
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx NWP
+                   programmer's
+                   guide (SWRU455) section 17.9.
+
+    \return         void
+
+ */
+void SimpleLinkNetAppRequestEventHandler(SlNetAppRequest_t *pNetAppRequest,
+                                         SlNetAppResponse_t *pNetAppResponse)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief          SimpleLinkHttpServerEventHandler
+
+    This handler gets called whenever a HTTP event is reported
+    by the NWP internal HTTP server.
+
+    \param          pHttpEvent       -   pointer to http event data.
+
+    \param          pHttpEvent       -   pointer to http response.
+
+    \return         void
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx NWP
+                   programmer's
+                   guide (SWRU455) chapter 9.
+
+ */
+void SimpleLinkHttpServerEventHandler(
+    SlNetAppHttpServerEvent_t *pHttpEvent,
+    SlNetAppHttpServerResponse_t *
+    pHttpResponse)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief          SimpleLinkWlanEventHandler
+
+    This handler gets called whenever a WLAN event is reported
+    by the host driver / NWP. Here user can implement he's own logic
+    for any of these events. This handler is used by 'network_terminal'
+    application to show case the following scenarios:
+
+    1. Handling connection / Disconnection.
+    2. Handling Addition of station / removal.
+    3. RX filter match handler.
+    4. P2P connection establishment.
+
+    \param          pWlanEvent       -   pointer to Wlan event data.
+
+    \return         void
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx
+                   NWP programmer's
+                   guide (SWRU455) sections 4.3.4, 4.4.5 and 4.5.5.
+
+    \sa             cmdWlanConnectCallback, cmdEnableFilterCallback, 
+    cmdWlanDisconnectCallback,
+                    cmdP2PModecallback.
+
+ */
+void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief          SimpleLinkGeneralEventHandler
+
+    This handler gets called whenever a general error is reported
+    by the NWP / Host driver. Since these errors are not fatal,
+    application can handle them.
+
+    \param          pDevEvent    -   pointer to device error event.
+
+    \return         void
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx NWP
+                   programmer's
+                   guide (SWRU455) section 17.9.
+
+ */
+void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent)
+{
+    /* Unused in this application */
+}
+
+/*!
+    \brief          SimpleLinkSockEventHandler
+
+    This handler gets called whenever a socket event is reported
+    by the NWP / Host driver.
+
+    \param          SlSockEvent_t    -   pointer to socket event data.
+
+    \return         void
+
+    \note          For more information, please refer to: user.h in the porting
+                   folder of the host driver and the  CC31xx/CC32xx NWP
+                   programmer's
+                   guide (SWRU455) section 7.6.
+                   
+
+ */
+void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
+{
+    /* Unused in this application */
+}
 
 void Connect(void)
 {
@@ -173,7 +333,7 @@ void Connect(void)
     secParams.Key = (signed char*)SECURITY_KEY;
     secParams.KeyLen = strlen(SECURITY_KEY);
     secParams.Type = SECURITY_TYPE;
-    //Display_printf(display, 0, 0, "Connecting to : %s.\r\n",SSID_NAME);
+    Display_printf(display, 0, 0, "Connecting to : %s.\r\n",SSID_NAME);
     ret = sl_WlanConnect((signed char*)SSID_NAME, strlen(
                              SSID_NAME), 0, &secParams, 0);
     if(ret)
@@ -193,7 +353,6 @@ void Connect(void)
 */
 static void DisplayBanner(char * AppName)
 {
-    /*
     Display_printf(display, 0, 0, "\n\n\n\r");
     Display_printf(display, 0, 0,
                    "\t\t *************************"
@@ -204,28 +363,26 @@ static void DisplayBanner(char * AppName)
                    "\t\t **************************"
                    "***********************\n\r");
     Display_printf(display, 0, 0, "\n\n\n\r");
-    */
 }
 
 
-void mainThread(void *pvParameters)
+void network_thread(void *pvParameters)
 {
     int32_t status = 0;
     pthread_attr_t pAttrs_spawn;
     struct sched_param priParam;
-
+	
     SPI_init();
-    //Display_init();
-    //display = Display_open(Display_Type_UART, NULL);
-    /*
+    Display_init();
+    display = Display_open(Display_Type_UART, NULL);
     if(display == NULL)
     {
+        /* Failed to open display driver */
         while(1)
         {
             ;
         }
     }
-*/
 
     /* Print Application name */
     DisplayBanner(APPLICATION_NAME);
@@ -246,7 +403,7 @@ void mainThread(void *pvParameters)
     mode = sl_Start(0, 0, 0);
     if (mode < 0)
     {
-        //Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, DEVICE_ERROR);
+        Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, DEVICE_ERROR);
     }
 
     if(mode != ROLE_STA)
@@ -255,20 +412,20 @@ void mainThread(void *pvParameters)
         mode = sl_WlanSetMode(ROLE_STA);
         if (mode < 0)
         {
-            //Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, WLAN_ERROR);
+            Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, WLAN_ERROR);
         }
 
         /* For changes to take affect, we restart the NWP */
         status = sl_Stop(SL_STOP_TIMEOUT);
         if (status < 0)
         {
-            //Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, status, DEVICE_ERROR);
+            Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, status, DEVICE_ERROR);
         }
 
         mode = sl_Start(0, 0, 0);
         if (mode < 0)
         {
-            //Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, DEVICE_ERROR);
+            Display_printf(display, 0, 0,"\n\r[line:%d, error code:%d] %s\n\r", __LINE__, mode, DEVICE_ERROR);
         }
     }
 
