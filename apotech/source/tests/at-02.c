@@ -2,6 +2,8 @@
 #include "board.h"
 
 #include "flash.h"
+#include "init.h"
+#include "network.h"
 #include "uart_term.h"
 
 #include <pthread.h>
@@ -11,21 +13,20 @@
 
 void * at_02_thread(void * arg0)
 {
-    configuration_t temp;
-
-    while (true)
-    {
-        temp = configuration_read();
-        temp.medication[0].count++;
-        UART_PRINT("%d\r\n", temp.medication[0].count);
-        configuration_write(temp);
-        sleep(2);
-        led_status_on();
-        sleep(3);
-        led_status_off();
-    }
+    while (true);
 
     return 0;
+}
+
+void print_banner(char * application)
+{
+    UART_PRINT("\n\r");
+    UART_PRINT("\n\r");
+    UART_PRINT("\t=============================================\n\r");
+    UART_PRINT("\t\t%s\n\r", application);
+    UART_PRINT("\t=============================================\n\r");
+    UART_PRINT("\n\r");
+    UART_PRINT("\n\r");
 }
 
 #define THREADSTACKSIZE (4096)
@@ -37,7 +38,11 @@ void * main_thread(void * arg0)
     int ret;
 
     hardware_init();
+
+    print_banner("AT-02");
+
     software_init();
+    network_connect();
 
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = 1;
@@ -49,6 +54,8 @@ void * main_thread(void * arg0)
 
     ret = pthread_create(NULL, &pAttrs, at_02_thread, NULL);
     if(ret != 0) while(1);
+
+    return 0;
 }
 
 int main()

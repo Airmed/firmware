@@ -77,7 +77,6 @@ typedef enum
 } board_uart_name;
 
 
-void hardware_init();
-void software_init();
+void board_init();
 
 #endif
