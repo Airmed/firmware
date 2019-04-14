@@ -21,6 +21,8 @@
 void init_button_interrupts();
 void init_database_polling();
 void poll_database();
+void get_configuration();
+void send_logs();
 void schedule_next_dispense();
 void dispense();
 void patient_button_callback(uint_least8_t index);
@@ -54,6 +56,12 @@ void init_database_polling()
 
 void poll_database()
 {
+    get_configuration();
+    send_logs();
+}
+
+void get_configuration()
+{
     database_medication_t * medication_arr = NULL;
     database_schedule_t * schedule_arr = NULL;
 
@@ -71,6 +79,27 @@ void poll_database()
     free((void *)schedule_arr);
 
     schedule_next_dispense();
+}
+
+void send_logs()
+{
+    file_log_t * log_arr;
+    uint8_t log_count = file_log_read(&log_arr);
+
+    for(uint8_t i = 0; i < log_count; i++)
+    {
+        database_log_t log;
+
+        // TODO translate
+
+        database_write_log(log);
+        if (log_arr->notify == true)
+        {
+            // TODO
+        }
+    }
+
+    free(log_arr);
 }
 
 void schedule_next_dispense()

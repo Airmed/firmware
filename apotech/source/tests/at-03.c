@@ -1,9 +1,5 @@
 
-#include "rtc.h"
-
-#include <ti/sysbios/knl/Clock.h>
 #include <unistd.h>
-#include <xdc/runtime/Error.h>
 
 extern void init_button_interrupts();
 extern void init_database_polling();

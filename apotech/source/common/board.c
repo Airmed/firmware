@@ -487,5 +487,6 @@ void software_init()
     }
 
     file_configuration_init();
+    file_log_init();
     rtc_init();
 }
