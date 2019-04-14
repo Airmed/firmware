@@ -6,6 +6,7 @@
 #include "flash.h"
 #include "leds.h"
 #include "pin_map.h"
+#include "rtc.h"
 #include "sensor.h"
 #include "shutter.h"
 #include "uart_term.h"
@@ -486,4 +487,5 @@ void software_init()
     }
 
     configuration_init();
+    rtc_init();
 }

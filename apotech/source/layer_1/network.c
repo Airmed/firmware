@@ -18,40 +18,50 @@ typedef enum
 static volatile network_status_e status = NETWORK_STATUS_DISCONNECTED;
 
 #define SL_STOP_TIMEOUT (200)
+#define SLNET_IF_WIFI_NAME ("CC32xx")
+#define SLNET_IF_WIFI_PRIO (5)
 
 void network_connect()
 {
     int32_t ret;
     SlWlanSecParams_t network_params;
 
-    ret = sl_WlanSetMode(ROLE_STA);
-
-    ret = sl_Stop(SL_STOP_TIMEOUT);
-    if(ret < 0)
+    if (status != NETWORK_STATUS_READY)
     {
-        UART_PRINT("sl_Stop failed\n\r");
-        while(1);
+        ret = sl_WlanSetMode(ROLE_STA);
+
+        ret = sl_Stop(SL_STOP_TIMEOUT);
+        if(ret < 0)
+        {
+            UART_PRINT("sl_Stop failed\n\r");
+            while(1);
+        }
+
+        ret = sl_Start(NULL, NULL, NULL);
+        if(ret != ROLE_STA)
+        {
+            UART_PRINT("role is not ROLE_STA\n\r");
+            while(1);
+        }
+
+        network_params.Type = NETWORK_SECURITY;
+        network_params.Key = (int8_t *)NETWORK_PASSWORD;
+        network_params.KeyLen = strlen( (char *)network_params.Key );
+
+        ret = sl_WlanConnect((signed char *)NETWORK_SSID, strlen(NETWORK_SSID), NULL, &network_params, NULL);
+        if (ret != 0)
+        {
+            UART_PRINT("failed to connect");
+            while(1);
+        }
+
+        sleep(1);
+
+        SlNetIf_init(0);
+        SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME, (const SlNetIf_Config_t *)&SlNetIfConfigWifi, SLNET_IF_WIFI_PRIO);
+        SlNetSock_init(0);
+        SlNetUtil_init(0);
     }
-
-    ret = sl_Start(NULL, NULL, NULL);
-    if(ret != ROLE_STA)
-    {
-        UART_PRINT("role is not ROLE_STA\n\r");
-        while(1);
-    }
-
-    network_params.Type = NETWORK_SECURITY;
-    network_params.Key = (int8_t *)NETWORK_PASSWORD;
-    network_params.KeyLen = strlen( (char *)network_params.Key );
-
-    ret = sl_WlanConnect((signed char *)NETWORK_SSID, strlen(NETWORK_SSID), NULL, &network_params, NULL);
-    if (ret != 0)
-    {
-        UART_PRINT("failed to connect");
-        while(1);
-    }
-
-    sleep(1);
 
     while (status != NETWORK_STATUS_READY) sleep(1);
 }
@@ -60,9 +70,6 @@ void network_disconnect()
 {
 
 }
-
-#define SLNET_IF_WIFI_NAME ("CC32xx")
-#define SLNET_IF_WIFI_PRIO (5)
 #define HTTP_HEADER ("Basic dZdDpXGVz0N0\r\nContent-Type: application/json")
 #define HTTP_REQUEST_POST_URI ("/")
 
@@ -70,11 +77,6 @@ network_handle_t network_server_connect(const char * hostname)
 {
     int16_t ret;
     network_handle_t handle;
-
-    SlNetIf_init(0);
-    SlNetIf_add(SLNETIF_ID_1, SLNET_IF_WIFI_NAME, (const SlNetIf_Config_t *)&SlNetIfConfigWifi, SLNET_IF_WIFI_PRIO);
-    SlNetSock_init(0);
-    SlNetUtil_init(0);
 
     handle = HTTPClient_create(&ret, 0);
     if (ret != 0)
