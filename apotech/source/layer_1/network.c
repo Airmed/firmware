@@ -24,12 +24,7 @@ void network_connect()
     int32_t ret;
     SlWlanSecParams_t network_params;
 
-    ret = sl_Start(0, 0, 0);
-    if(ret < 0)
-    {
-        UART_PRINT("sl_Start failed\n\r");
-        while(1);
-    }
+    ret = sl_WlanSetMode(ROLE_STA);
 
     ret = sl_Stop(SL_STOP_TIMEOUT);
     if(ret < 0)
@@ -38,7 +33,6 @@ void network_connect()
         while(1);
     }
 
-    ret = sl_WlanSetMode(ROLE_STA);
     ret = sl_Start(NULL, NULL, NULL);
     if(ret != ROLE_STA)
     {
@@ -57,17 +51,14 @@ void network_connect()
         while(1);
     }
 
+    sleep(1);
+
     while (status != NETWORK_STATUS_READY) sleep(1);
 }
 
 void network_disconnect()
 {
-    int32_t ret = sl_Stop(SL_STOP_TIMEOUT);
-    if(ret < 0)
-    {
-        UART_PRINT("sl_Stop failed\n\r");
-        while(1);
-    }
+
 }
 
 #define SLNET_IF_WIFI_NAME ("CC32xx")
@@ -159,11 +150,6 @@ uint32_t network_send_request(const network_handle_t handle, const char * comman
     return len;
 }
 
-void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent)
-{
-    __asm ("bkpt #0");
-}
-
 void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
 {
     switch(pWlanEvent->Id)
@@ -211,27 +197,10 @@ void SimpleLinkNetAppEventHandler(SlNetAppEvent_t *pNetAppEvent)
     }
 }
 
-void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *slFatalErrorEvent)
-{
-    __asm ("bkpt #3");
-}
-
-void SimpleLinkSockEventHandler(SlSockEvent_t *pSock)
-{
-    __asm ("bkpt #4");
-}
-
-void SimpleLinkHttpServerEventHandler(SlNetAppHttpServerEvent_t *pHttpEvent, SlNetAppHttpServerResponse_t * pHttpResponse)
-{
-    __asm ("bkpt #5");
-}
-
-void SimpleLinkNetAppRequestEventHandler(SlNetAppRequest_t *pNetAppRequest, SlNetAppResponse_t *pNetAppResponse)
-{
-    __asm ("bkpt #6");
-}
-
-void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer)
-{
-    __asm ("bkpt #7");
-}
+// unused callbacks
+void SimpleLinkGeneralEventHandler(SlDeviceEvent_t *pDevEvent) {}
+void SimpleLinkFatalErrorEventHandler(SlDeviceFatal_t *slFatalErrorEvent) {}
+void SimpleLinkSockEventHandler(SlSockEvent_t *pSock) {}
+void SimpleLinkHttpServerEventHandler(SlNetAppHttpServerEvent_t *pHttpEvent, SlNetAppHttpServerResponse_t * pHttpResponse) {}
+void SimpleLinkNetAppRequestEventHandler(SlNetAppRequest_t *pNetAppRequest, SlNetAppResponse_t *pNetAppResponse) {}
+void SimpleLinkNetAppRequestMemFreeEventHandler(uint8_t *buffer) {}

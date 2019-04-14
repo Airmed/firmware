@@ -478,5 +478,12 @@ void software_init()
     ret |= pthread_create(NULL, &pAttrs, sl_Task, NULL);
     if(ret != 0) while(1);
 
+    ret = sl_Start(0, 0, 0);
+    if(ret < 0)
+    {
+        UART_PRINT("sl_Start failed\n\r");
+        while(1);
+    }
+
     configuration_init();
 }
