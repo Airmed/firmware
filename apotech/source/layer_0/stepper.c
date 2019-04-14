@@ -3,7 +3,6 @@
 
 #include "board.h"
 #include "pin_map.h"
-#include "pwm.h"
 
 #include <stdint.h>
 #include <ti/drivers/GPIO.h>

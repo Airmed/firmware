@@ -44,8 +44,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.922464854" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.1603431538" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -172,8 +170,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.1532918890" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.1187990139" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -299,8 +295,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.294089867" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.230888792" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -426,8 +420,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.1429847540" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.83106975" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -553,8 +545,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.2003088855" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.359289248" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -680,8 +670,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.859024847" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.519688198" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -804,8 +792,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option IS_BUILTIN_EMPTY="false" IS_VALUE_EMPTY="false" id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE.433306812" name="Define symbols (-D)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.DEFINE" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="${INHERITED_SYMBOLS}"/>
@@ -936,8 +922,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.1962152055" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.2020318054" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
@@ -1063,8 +1047,6 @@
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_0&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_1&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_2&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${PROJECT_LOC}/source/layer_3&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU.488208288" name="Target CPU (-mcpu)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MCPU" useByScannerDiscovery="false" value="cortex-m4" valueType="string"/>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH.379815059" name="Target architecture (-march)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.compilerID.MARCH" useByScannerDiscovery="false" value="armv7e-m" valueType="string"/>
