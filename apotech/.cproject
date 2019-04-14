@@ -95,6 +95,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.108303555" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -218,6 +219,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.1651994524" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -340,6 +342,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.1981253967" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -462,6 +465,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.39263688" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -584,6 +588,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.2042904777" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -706,6 +711,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.1420038476" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -806,9 +812,15 @@
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/tirtos/packages"/>
 									<listOptionValue builtIn="false" value="${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/kernel/tirtos/packages/gnu/targets/arm/libs/install-native/arm-none-eabi/lib/thumb/v7e-m"/>
 									<listOptionValue builtIn="false" value="${CG_TOOL_ROOT}/arm-none-eabi/lib"/>
+									<listOptionValue builtIn="false" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/lib&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/drivers/net/wifi/slnetif&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.LIBRARY.514282900" name="Libraries (-l, --library)" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.LIBRARY" useByScannerDiscovery="false" valueType="libs">
 									<listOptionValue builtIn="false" value="${INHERITED_LIBRARIES}"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
 									<listOptionValue builtIn="false" value="ti/display/lib/display.am4g"/>
 									<listOptionValue builtIn="false" value="ti/grlib/lib/gcc/m4/grlib.a"/>
 									<listOptionValue builtIn="false" value="third_party/spiffs/lib/gcc/m4/spiffs.a"/>
@@ -944,6 +956,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.1929011693" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>
@@ -1066,6 +1079,7 @@
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/httpclient_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/m4/slnetsock_release.a"/>
 									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="gcc/Release/slnetifwifi.a"/>
+									<listOptionValue builtIn="false" srcPrefixMapping="" srcRootPath="" value="&quot;${COM_TI_SIMPLELINK_CC32XX_SDK_INSTALL_DIR}/source/ti/net/http/lib&quot;"/>
 								</option>
 								<option id="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS.131751004" name="Miscellaneous flags" superClass="com.ti.ccstudio.buildDefinitions.TMS470_GNU_7.0.linkerID.OTHER_FLAGS" useByScannerDiscovery="false" valueType="stringList">
 									<listOptionValue builtIn="false" value="-march=armv7e-m"/>

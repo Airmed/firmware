@@ -17,8 +17,6 @@
 #include <string.h>
 #include <ti/drivers/GPIO.h>
 #include <ti/drivers/net/wifi/simplelink.h>
-#include <ti/drivers/net/wifi/slnetifwifi.h>
-#include <ti/drivers/net/wifi/wlan.h>
 #include <ti/drivers/SPI.h>
 
 void hardware_init()
@@ -54,28 +52,6 @@ void software_init()
 
     ret = pthread_create(NULL, &pAttrs, sl_Task, NULL);
     if(ret != 0) while(1);
-
-    ret = sl_Start(0, 0, 0);
-    if(ret < 0)
-    {
-        UART_PRINT("sl_Start failed\n\r");
-        while(1);
-    }
-
-    ret = sl_Stop(200);
-    if(ret < 0)
-    {
-        UART_PRINT("sl_Stop failed\n\r");
-        while(1);
-    }
-
-    ret = sl_WlanSetMode(ROLE_STA);
-    ret = sl_Start(NULL, NULL, NULL);
-    if(ret != ROLE_STA)
-    {
-        UART_PRINT("role is not ROLE_STA\n\r");
-        while(1);
-    }
 
     configuration_init();
 }

@@ -1,9 +1,9 @@
 
 #include "board.h"
 
+#include "database.h"
 #include "flash.h"
 #include "init.h"
-#include "network.h"
 #include "uart_term.h"
 
 #include <pthread.h>
@@ -13,6 +13,11 @@
 
 void * at_02_thread(void * arg0)
 {
+    database_init();
+    database_read_medications(NULL);
+    database_read_schedule(NULL);
+    database_deinit();
+
     while (true);
 
     return 0;
@@ -42,7 +47,6 @@ void * main_thread(void * arg0)
     print_banner("AT-02");
 
     software_init();
-    network_connect();
 
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = 1;
