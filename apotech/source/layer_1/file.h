@@ -2,6 +2,7 @@
 #ifndef __FILE_H__
 #define __FILE_H__
 
+#include <stdbool.h>
 #include <stdint.h>
 
 #define FILE_MAX_MEDICATIONS (4)
@@ -10,8 +11,7 @@
 
 typedef struct
 {
-    uint8_t hour;
-    uint8_t minute;
+    uint8_t time_of_day;
     uint8_t count;
 } file_dispense_slot_t;
 
@@ -19,6 +19,7 @@ typedef struct
 {
     char name[FILE_MAX_MEDICATION_NAME_LEN];
     uint8_t count;
+    bool next;
     file_dispense_slot_t dispense_slot[FILE_MAX_DISPENSE_SLOTS];
 } file_medication_t;
 

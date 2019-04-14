@@ -49,7 +49,7 @@ void file_configuration_print(file_configuration_t data)
         UART_PRINT("  {%s, %d, {", ptr_medication->name, ptr_medication->count);
         for (uint8_t j = 0; j < FILE_MAX_DISPENSE_SLOTS; j++)
         {
-            UART_PRINT(" {%d, %d, %d} ", ptr_medication->dispense_slot[j].hour, ptr_medication->dispense_slot[j].minute, ptr_medication->dispense_slot[j].count);
+            UART_PRINT(" {%d, %d, %d} ", ptr_medication->dispense_slot[j].time_of_day, ptr_medication->dispense_slot[j].count);
         }
         UART_PRINT("}\r\n");
     }

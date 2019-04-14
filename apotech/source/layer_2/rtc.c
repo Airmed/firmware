@@ -12,6 +12,8 @@
 #define RTC_DELAY_MS (1000)
 
 uint32_t rtc_val_s = 0;
+uint32_t rtc_val_interrupt = -1;
+void (* rtc_callback)() = NULL;
 
 void rtc_init()
 {
@@ -41,7 +43,7 @@ void rtc_update_time()
     ret = SNTP_getTime(servers, num_servers, &timeout, &curr_time);
     if (ret == 0)
     {
-        rtc_val_s = (curr_time >> 32) & 0xFFFFFFFF;
+        rtc_val_s = rtc_utc_to_mdt((curr_time >> 32) & 0xFFFFFFFF);
     }
 }
 
@@ -53,4 +55,25 @@ void rtc_increment_time()
 uint32_t rtc_get_time()
 {
     return rtc_val_s;
+}
+
+void rtc_register_callback(uint32_t time, void (* callback)())
+{
+    rtc_val_interrupt = time;
+    rtc_callback = callback;
+}
+
+uint32_t rtc_utc_to_mdt(uint32_t time)
+{
+    return time - 6*60*60;
+}
+
+uint32_t rtc_time_of_day(uint32_t time)
+{
+    return time % (24*60*60);
+}
+
+uint32_t rtc_day(uint32_t time)
+{
+    return time / (24*60*60);
 }
