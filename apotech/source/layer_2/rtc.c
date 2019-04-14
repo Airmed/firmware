@@ -9,6 +9,8 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <xdc/runtime/Error.h>
 
+#define RTC_DELAY_MS (1000)
+
 uint32_t rtc_val_s = 0;
 
 void rtc_init()
@@ -18,10 +20,10 @@ void rtc_init()
 
     Clock_Params clock_params;
     Clock_Params_init(&clock_params);
-    clock_params.period = 1000;
+    clock_params.period = RTC_DELAY_MS;
     clock_params.startFlag = TRUE;
-    clock_params.arg = NULL;
-    Clock_create(rtc_increment_time, 1000, &clock_params, Error_IGNORE);
+    clock_params.arg = (xdc_UArg)NULL;
+    Clock_create(rtc_increment_time, RTC_DELAY_MS, &clock_params, Error_IGNORE);
 }
 
 void rtc_update_time()
