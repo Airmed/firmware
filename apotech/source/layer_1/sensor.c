@@ -6,7 +6,7 @@
 
 #include <stdbool.h>
 #include <stdint.h>
-#include "ti/drivers/ADC.h"
+#include <ti/drivers/ADC.h>
 
 void sensor_init(sensor_t * sensor)
 {

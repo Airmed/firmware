@@ -2,7 +2,7 @@
 #include "board.h"
 
 #include "database.h"
-#include "flash.h"
+#include "file.h"
 #include "rtc.h"
 #include "uart_term.h"
 
@@ -36,6 +36,6 @@ void poll_print_database()
 {
     poll_database();
 
-    configuration_t configuration = configuration_read();
-    configuration_print(configuration);
+    file_configuration_t configuration = file_configuration_read();
+    file_configuration_print(configuration);
 }

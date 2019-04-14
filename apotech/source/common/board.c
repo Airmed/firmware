@@ -3,7 +3,7 @@
 
 #include "buzzer.h"
 #include "drum.h"
-#include "flash.h"
+#include "file.h"
 #include "leds.h"
 #include "pin_map.h"
 #include "rtc.h"
@@ -486,6 +486,6 @@ void software_init()
         while(1);
     }
 
-    configuration_init();
+    file_configuration_init();
     rtc_init();
 }

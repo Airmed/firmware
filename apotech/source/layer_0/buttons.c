@@ -5,7 +5,7 @@
 #include "pin_map.h"
 
 #include <stdbool.h>
-#include "ti/drivers/GPIO.h"
+#include <ti/drivers/GPIO.h>
 
 bool button_patient_get_status()
 {

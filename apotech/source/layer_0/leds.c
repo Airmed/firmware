@@ -4,7 +4,7 @@
 #include "board.h"
 #include "pin_map.h"
 
-#include "ti/drivers/GPIO.h"
+#include <ti/drivers/GPIO.h>
 
 void leds_init()
 {

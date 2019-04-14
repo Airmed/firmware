@@ -4,7 +4,7 @@
 #include "network.h"
 #include "uart_term.h"
 
-#include "stdint.h"
+#include <stdint.h>
 
 #define DATABASE_HOSTNAME ("https://seniordesigndb.herokuapp.com")
 #define DATABASE_QUERY_MEDICATIONS ("{\"query\":\"select * from medications;\"}")

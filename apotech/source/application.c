@@ -4,14 +4,14 @@
 #include "buzzer.h"
 #include "database.h"
 #include "drum.h"
-#include "flash.h"
+#include "file.h"
 #include "sensor.h"
 #include "shutter.h"
 
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-#include "ti/drivers/GPIO.h"
+#include <ti/drivers/GPIO.h>
 #include <unistd.h>
 
 void * prod_thread(void * arg0)
@@ -34,12 +34,12 @@ void poll_database()
     uint8_t medication_count = database_read_medications(&medication_arr);
     uint8_t schedule_count = database_read_schedule(&schedule_arr);
 
-    configuration_t configuration;
-    memset(&configuration, 0, sizeof(configuration_t));
+    file_configuration_t configuration;
+    memset(&configuration, 0, sizeof(file_configuration_t));
 
     // TODO translate
 
-    configuration_write(configuration);
+    file_configuration_write(configuration);
 
     free((void *)medication_arr);
     free((void *)schedule_arr);
