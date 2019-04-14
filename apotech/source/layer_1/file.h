@@ -33,16 +33,16 @@ file_configuration_t file_configuration_read();
 void file_configuration_write(file_configuration_t data);
 void file_configuration_print(file_configuration_t data);
 
-typedef enum
+typedef struct
 {
-    FILE_LOG_TYPE_DISPENSE_ERROR
-} file_log_type_t;
+    uint8_t type;
+    uint32_t time;
+    bool notify;
+} file_log_header_t;
 
 typedef struct
 {
-    uint32_t time;
-    file_log_type_t type;
-    bool notify;
+    file_log_header_t header;
 } file_log_t;
 
 void file_log_init();

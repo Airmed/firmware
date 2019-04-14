@@ -1,7 +1,6 @@
 
 #include "buttons.h"
-#include "file.h"
-#include "rtc.h"
+#include "log.h"
 
 #include <stdbool.h>
 #include <unistd.h>
@@ -16,12 +15,7 @@ void * at_04_thread(void * arg0)
     {
         while (button_patient_get_status() == false) usleep(1000);
 
-        file_log_t log;
-        log.time = rtc_get_time();
-        log.type = FILE_LOG_TYPE_DISPENSE_ERROR;
-        log.notify = true;
-
-        file_log_write(log);
+        log_new(LOG_TYPE_DISPENSE_ERROR);
 
         while (button_patient_get_status() == true) sleep(1);
     }
