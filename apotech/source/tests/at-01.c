@@ -1,13 +1,10 @@
 
-#include "board.h"
 #include "buttons.h"
 #include "drum.h"
 #include "leds.h"
 #include "shutter.h"
 
-#include <pthread.h>
-#include <stdbool.h>
-#include <ti/sysbios/BIOS.h>
+#include <stdint.h>
 
 #define PILLS_PER_HOPPER (10)
 #define DISPENSE_RETRIES (2)
@@ -16,7 +13,7 @@ void * at_01_thread(void * arg0)
 {
     shutter_dispense_t ret;
 
-    while (true)
+    while (1)
     {
         for (uint8_t pills_dispensed = 0; pills_dispensed < PILLS_PER_HOPPER; pills_dispensed++)
         {

@@ -1,13 +1,7 @@
 
-#include "board.h"
-
-#include <pthread.h>
-#include <stdbool.h>
-#include <ti/sysbios/BIOS.h>
-
 void * at_04_thread(void * arg0)
 {
-    while (true);
+    while (1);
 
     return 0;
 }

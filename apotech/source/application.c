@@ -16,7 +16,7 @@
 
 void * prod_thread(void * arg0)
 {
-    while (true)
+    while (1)
     {
         while (button_patient_get_status() == false) usleep(1000);
 

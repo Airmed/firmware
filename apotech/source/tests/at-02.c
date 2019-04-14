@@ -1,17 +1,12 @@
 
-#include "board.h"
-
 #include "database.h"
 #include "file.h"
 #include "rtc.h"
 #include "uart_term.h"
 
-#include <pthread.h>
 #include <stdbool.h>
-#include <ti/sysbios/BIOS.h>
 #include <ti/sysbios/knl/Clock.h>
 #include <xdc/runtime/Error.h>
-#include <unistd.h>
 
 #define POLL_DATABASE_DELAY_MS (5000)
 
@@ -27,7 +22,7 @@ void * at_02_thread(void * arg0)
     clock_params.arg = (xdc_UArg)NULL;
     Clock_create(poll_print_database, POLL_DATABASE_DELAY_MS, &clock_params, Error_IGNORE);
 
-    while (true);
+    while (1);
 
     return 0;
 }

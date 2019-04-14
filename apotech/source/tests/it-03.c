@@ -1,17 +1,12 @@
 
-#include "board.h"
 #include "buttons.h"
 #include "drum.h"
-
-#include <pthread.h>
-#include <stdbool.h>
-#include <ti/sysbios/BIOS.h>
 
 void * it_03_thread(void * arg0)
 {
     drum_hoppers_e hopper_next = DRUM_HOPPER_1;
 
-    while (true)
+    while (1)
     {
         while (button_patient_get_status() == false);
 
