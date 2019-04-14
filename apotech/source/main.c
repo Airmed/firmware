@@ -32,9 +32,10 @@ void * main_thread(void * arg0)
     int ret;
 
     hardware_init();
-    software_init();
 
     print_banner(APP_STRING);
+
+    software_init();
 
     pthread_attr_init(&pAttrs);
     priParam.sched_priority = 1;

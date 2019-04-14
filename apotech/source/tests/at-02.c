@@ -9,7 +9,7 @@
 #include <unistd.h>
 #include <xdc/runtime/Error.h>
 
-#define POLL_DATABASE_DELAY_MS (5000)
+#define POLL_DATABASE_DELAY_MS (15000)
 
 extern void poll_database();
 void poll_print_database();
