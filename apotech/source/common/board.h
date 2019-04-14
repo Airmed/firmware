@@ -78,5 +78,7 @@ typedef enum
 
 
 void board_init();
+void hardware_init();
+void software_init();
 
 #endif

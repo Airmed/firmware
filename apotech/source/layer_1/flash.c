@@ -14,7 +14,7 @@ void configuration_init()
     int32_t handle;
     SlFsFileInfo_t info;
 
-    if (sl_FsGetInfo((uint8_t *)configuration_file_name, NULL, &info) != 0)
+    if (sl_FsGetInfo((uint8_t *)configuration_file_name, 0, &info) != 0)
     {
         handle = sl_FsOpen((uint8_t *)configuration_file_name,
                            SL_FS_CREATE | SL_FS_CREATE_MAX_SIZE( sizeof(configuration_t) ),

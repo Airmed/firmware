@@ -11,7 +11,7 @@
 #include "ti/drivers/GPIO.h"
 #include <unistd.h>
 
-void * application_thread(void * arg0)
+void * prod_thread(void * arg0)
 {
     while (true)
     {

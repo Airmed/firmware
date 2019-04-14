@@ -338,3 +338,14 @@ void putch(char ch)
 {
     UART_writePolling(uartHandle, &ch, 1);
 }
+
+void print_banner(char * application)
+{
+    UART_PRINT("\n\r");
+    UART_PRINT("\n\r");
+    UART_PRINT("\t=============================================\n\r");
+    UART_PRINT("\t\t%s\n\r", application);
+    UART_PRINT("\t=============================================\n\r");
+    UART_PRINT("\n\r");
+    UART_PRINT("\n\r");
+}

@@ -33,4 +33,6 @@ char getch(void);
 
 void putch(char ch);
 
+void print_banner(char * application);
+
 #endif // __UART_IF_H__
