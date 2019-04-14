@@ -25,21 +25,19 @@ void configuration_init()
 
 configuration_t configuration_read()
 {
-    int32_t ret;
     configuration_t config;
     int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_READ, NULL);
-    ret = sl_FsRead(handle, 0, (uint8_t *)&config, sizeof(configuration_t));
-    ret = sl_FsClose(handle, NULL, NULL, 0);
+    sl_FsRead(handle, 0, (uint8_t *)&config, sizeof(configuration_t));
+    sl_FsClose(handle, NULL, NULL, 0);
 
     return config;
 }
 
 void configuration_write(configuration_t data)
 {
-    int32_t ret;
     int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_WRITE, NULL);
-    ret = sl_FsWrite(handle, 0, (uint8_t *)&data, sizeof(configuration_t));
-    ret = sl_FsClose(handle, NULL, NULL, 0);
+    sl_FsWrite(handle, 0, (uint8_t *)&data, sizeof(configuration_t));
+    sl_FsClose(handle, NULL, NULL, 0);
 }
 
 void configuration_print(configuration_t data)
