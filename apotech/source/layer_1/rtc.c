@@ -17,7 +17,6 @@ void (* rtc_callback)() = NULL;
 
 void rtc_init()
 {
-    network_connect();
     rtc_update_time();
 
     Clock_Params clock_params;
@@ -44,6 +43,7 @@ void rtc_update_time()
     if (ret == 0)
     {
         rtc_val_s = rtc_utc_to_mdt((curr_time >> 32) & 0xFFFFFFFF);
+        UART_PRINT("time updated: %u\n\r", rtc_val_s);
     }
 }
 

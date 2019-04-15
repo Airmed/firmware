@@ -110,7 +110,7 @@ void network_server_disconnect(const network_handle_t handle)
     ret = HTTPClient_disconnect(handle);
     if(ret < 0)
     {
-        UART_PRINT("httpTask: disconnect failed: %d", ret);
+        UART_PRINT("failed to disconnect from server");
     }
 
     HTTPClient_destroy(handle);

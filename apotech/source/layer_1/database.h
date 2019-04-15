@@ -22,9 +22,6 @@ typedef struct
     uint32_t temp;
 } database_log_t;
 
-void database_init();
-void database_deinit();
-
 uint8_t database_read_medications(database_medication_t ** ptr_medication_arr);
 uint8_t database_read_schedule(database_schedule_t ** ptr_schedule_arr);
 void database_write_log(database_log_t log);

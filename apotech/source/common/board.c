@@ -5,6 +5,7 @@
 #include "drum.h"
 #include "file.h"
 #include "leds.h"
+#include "network.h"
 #include "pin_map.h"
 #include "rtc.h"
 #include "sensor.h"
@@ -488,5 +489,6 @@ void software_init()
 
     file_configuration_init();
     file_log_init();
+    network_connect();
     rtc_init();
 }
