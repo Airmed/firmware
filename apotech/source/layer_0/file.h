@@ -11,6 +11,7 @@
 
 typedef struct
 {
+    bool valid;
     uint8_t time_of_day;
     uint8_t count;
 } file_dispense_slot_t;
