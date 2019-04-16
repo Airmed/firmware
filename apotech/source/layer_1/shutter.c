@@ -48,7 +48,7 @@ void shutter_init()
 #define STEP_COUNT_OVERSHOOT (32)
 #define PILL_COUNT_DELAY_US (1000000)
 
-shutter_dispense_t shutter_dispense()
+uint8_t shutter_dispense()
 {
     bool sensor_status = false, sensor_status_last = false;
     volatile uint8_t pills_dispensed = 0;
@@ -92,9 +92,7 @@ shutter_dispense_t shutter_dispense()
     usleep(PILL_COUNT_DELAY_US);
     Clock_delete(&pill_count_clock);
 
-    if (pills_dispensed == 0) return SHUTTER_DISPENSE_NONE;
-    else if (pills_dispensed == 1) return SHUTTER_DISPENSE_SUCCESS;
-    else return SHUTTER_DISPENSE_MULTIPLE;
+    return pills_dispensed;
 }
 
 xdc_Void shutter_count(xdc_UArg arg1)

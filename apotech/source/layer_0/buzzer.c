@@ -12,7 +12,7 @@ static PWM_Handle handle;
 void buzzer_init()
 {
     PWM_init();
-    PWM_Handle handle = PWM_open(BOARD_BUZZER_PWM, NULL);
+    handle = PWM_open(BOARD_BUZZER_PWM, NULL);
     if (handle == 0)
     {
         while(1);
@@ -24,6 +24,7 @@ void buzzer_init()
 void buzzer_set_freq(uint32_t freq)
 {
     PWM_setDutyAndPeriod(handle, PWM_DUTY_CYCLE_50, freq);
+    PWM_start(handle);
 }
 
 void buzzer_off()

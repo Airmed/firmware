@@ -11,34 +11,34 @@
 
 void * at_01_thread(void * arg0)
 {
-    shutter_dispense_t ret;
+    uint8_t pills_dispensed;
 
     while (1)
     {
-        for (uint8_t pills_dispensed = 0; pills_dispensed < PILLS_PER_HOPPER; pills_dispensed++)
+        for (uint8_t pill = 0; pill < PILLS_PER_HOPPER; pill++)
         {
             while (button_patient_get_status() == false);
             led_status_off();
             led_error_off();
 
-            ret = shutter_dispense();
-            for (uint8_t i = 0; i < DISPENSE_RETRIES && ret == SHUTTER_DISPENSE_NONE; i++)
+            pills_dispensed = shutter_dispense();
+            for (uint8_t i = 0; i < DISPENSE_RETRIES && pills_dispensed == 0; i++)
             {
-                ret = shutter_dispense();
+                pills_dispensed = shutter_dispense();
             }
 
-            if (ret == SHUTTER_DISPENSE_NONE)
+            if (pills_dispensed == 0)
             {
                 led_status_off();
                 led_error_on();
                 break; // hopper is empty
             }
-            else if (ret == SHUTTER_DISPENSE_SUCCESS)
+            else if (pills_dispensed == 1)
             {
                 led_status_on();
                 led_error_off();
             }
-            else if (ret == SHUTTER_DISPENSE_MULTIPLE)
+            else if (pills_dispensed > 1)
             {
                 led_status_off();
                 led_error_on();

@@ -1,23 +1,35 @@
 
 #include "buttons.h"
+#include "events.h"
 #include "log.h"
 
 #include <stdbool.h>
 #include <unistd.h>
 
-extern void init_database_polling();
+extern uint32_t unhandled_events;
+
+extern void init_updates();
 
 void * at_04_thread(void * arg0)
 {
-    init_database_polling();
+    init_updates();
 
     while (1)
     {
-        while (button_patient_get_status() == false) usleep(1000);
+        uint32_t prev_events = unhandled_events;
+        unhandled_events &= ~prev_events;
 
-        log_new(LOG_TYPE_DISPENSE_ERROR);
+        if (prev_events & EVENT_UPDATE)
+        {
+            log_send_new();
+        }
 
-        while (button_patient_get_status() == true) sleep(1);
+        if (button_patient_get_status() == true)
+        {
+            while (button_patient_get_status() == true) usleep(10000);
+        }
+
+        usleep(1000);
     }
 
     return 0;

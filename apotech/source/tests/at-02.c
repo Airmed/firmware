@@ -1,49 +1,44 @@
 
-#include "database.h"
+#include "events.h"
 #include "file.h"
-#include "rtc.h"
-#include "uart_term.h"
+#include "schedule.h"
 
-#include <stdbool.h>
-#include <ti/sysbios/knl/Clock.h>
 #include <unistd.h>
-#include <xdc/runtime/Error.h>
 
-#define POLL_DATABASE_DELAY_MS (15000)
+//typedef enum
+//{
+//    NETWORK_STATUS_READY,
+//    NETWORK_STATUS_CONNECTED,
+//    NETWORK_STATUS_DISCONNECTED
+//} network_status_e;
 
-static bool poll_print_flag = true;
+extern uint32_t unhandled_events;
+//extern volatile network_status_e status;
 
-extern void poll_database();
-void poll_print_callback();
+extern void init_updates();
 
 void * at_02_thread(void * arg0)
 {
-    Clock_Params clock_params;
-    Clock_Params_init(&clock_params);
-    clock_params.period = POLL_DATABASE_DELAY_MS;
-    clock_params.startFlag = TRUE;
-    clock_params.arg = (xdc_UArg)NULL;
-    Clock_create(poll_print_callback, POLL_DATABASE_DELAY_MS, &clock_params, Error_IGNORE);
+    init_updates();
 
     while (1)
     {
-        if (poll_print_flag == true)
+        uint32_t prev_events = unhandled_events;
+        unhandled_events &= ~prev_events;
+
+        if (prev_events & EVENT_UPDATE)
         {
-            poll_print_flag = false;
+//            if (status == NETWORK_STATUS_READY)
+//            {
+                schedule_update();
+//            }
 
-            poll_database();
-
-            file_configuration_t configuration = file_configuration_read();
+            configuration_t configuration = file_configuration_read();
             file_configuration_print(configuration);
         }
 
-        sleep(1);
+        usleep(1000);
     }
 
     return 0;
-}
-
-void poll_print_callback()
-{
-    poll_print_flag = true;
 }

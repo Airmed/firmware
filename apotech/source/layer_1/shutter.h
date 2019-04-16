@@ -2,15 +2,9 @@
 #ifndef __SHUTTER_H__
 #define __SHUTTER_H__
 
-typedef enum
-{
-    SHUTTER_DISPENSE_SUCCESS,
-    SHUTTER_DISPENSE_NONE,
-    SHUTTER_DISPENSE_MULTIPLE
-} shutter_dispense_t;
+#include "stdint.h"
 
 void shutter_init();
-
-shutter_dispense_t shutter_dispense();
+uint8_t shutter_dispense();
 
 #endif

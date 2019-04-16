@@ -2,12 +2,9 @@
 #ifndef __LOG_H__
 #define __LOG_H__
 
-typedef enum
-{
-    LOG_TYPE_DISPENSE_ERROR
-} log_type_t;
+#include "data_types.h"
 
-void log_new(log_type_t type);
+void log_new(log_type_e type);
 void log_send_new();
 
 #endif

@@ -15,7 +15,7 @@ typedef enum
     NETWORK_STATUS_DISCONNECTED
 } network_status_e;
 
-static volatile network_status_e status = NETWORK_STATUS_DISCONNECTED;
+volatile network_status_e status = NETWORK_STATUS_DISCONNECTED;
 
 #define SL_STOP_TIMEOUT (200)
 #define SLNET_IF_WIFI_NAME ("CC32xx")
@@ -63,15 +63,20 @@ void network_connect()
         SlNetUtil_init(0);
     }
 
-    while (status != NETWORK_STATUS_READY) sleep(1);
+    uint8_t disconnected_count = 0;
+    while (status != NETWORK_STATUS_READY)
+    {
+        disconnected_count++;
+        if (disconnected_count > 10)
+        {
+            UART_PRINT("did not connect to network after 10 seconds\n\r");
+            break;
+        }
+        sleep(1);
+    }
 }
 
-void network_disconnect()
-{
-
-}
-
-#define HTTP_HEADER ("Basic dZdDpXGVz0N0\r\nContent-Type: application/json")
+static char header[] = "Basic dZdDpXGVz0N0\r\nContent-Type: application/json";
 #define HTTP_REQUEST_POST_URI ("/")
 
 network_handle_t network_server_connect(const char * hostname)
@@ -82,22 +87,22 @@ network_handle_t network_server_connect(const char * hostname)
     handle = HTTPClient_create(&ret, 0);
     if (ret != 0)
     {
-        UART_PRINT("failed to create HTTP client");
-        while(1);
+        UART_PRINT("failed to create HTTP client\n\r");
+        return NULL;
     }
 
-    ret = HTTPClient_setHeader(handle, HTTPClient_HFIELD_REQ_AUTHORIZATION, HTTP_HEADER, sizeof(HTTP_HEADER) - 1, HTTPClient_HFIELD_PERSISTENT);
+    ret = HTTPClient_setHeader(handle, HTTPClient_HFIELD_REQ_AUTHORIZATION, header, 53, HTTPClient_HFIELD_PERSISTENT);
     if (ret != 0)
     {
-        UART_PRINT("failed to set header");
-        while(1);
+        UART_PRINT("failed to set header\n\r");
+        return NULL;
     }
 
     ret = HTTPClient_connect(handle, hostname, 0, 0);
     if(ret < 0)
     {
-        UART_PRINT("failed to connect to server");
-        while(1);
+        UART_PRINT("failed to connect to server\n\r");
+        return NULL;
     }
 
     return handle;
@@ -107,10 +112,12 @@ void network_server_disconnect(const network_handle_t handle)
 {
     int16_t ret;
 
+    if (handle == NULL) return;
+
     ret = HTTPClient_disconnect(handle);
     if(ret < 0)
     {
-        UART_PRINT("failed to disconnect from server");
+        UART_PRINT("failed to disconnect from server\n\r");
     }
 
     HTTPClient_destroy(handle);
@@ -125,6 +132,8 @@ uint32_t network_send_request(const network_handle_t handle, const char * comman
     uint32_t len = 0;
     *ptr_response = NULL;
     char * curr_loc;
+
+    if (handle == NULL) return 0;
 
     ret = HTTPClient_sendRequest(handle, HTTP_METHOD_POST, HTTP_REQUEST_POST_URI, command, strlen(command), 0);
 

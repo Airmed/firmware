@@ -1,6 +1,7 @@
 
 #include "rtc.h"
 
+#include "data_types.h"
 #include "network.h"
 #include "uart_term.h"
 
@@ -15,6 +16,9 @@ uint32_t rtc_val_s = 0;
 uint32_t rtc_val_interrupt = -1;
 void (* rtc_callback)() = NULL;
 
+static rtc_dispense_info_t next_dispense;
+static rtc_dispense_info_t dispense_buffer;
+
 void rtc_init()
 {
     rtc_update_time();
@@ -25,6 +29,9 @@ void rtc_init()
     clock_params.startFlag = TRUE;
     clock_params.arg = (xdc_UArg)NULL;
     Clock_create(rtc_increment_time, RTC_DELAY_MS, &clock_params, Error_IGNORE);
+
+    next_dispense.valid = false;
+    dispense_buffer.valid = false;
 }
 
 void rtc_update_time()
@@ -35,11 +42,7 @@ void rtc_update_time()
     timeout.tv_sec = 30;
     timeout.tv_usec = 0;
 
-    static const int num_servers = 1;
-    const char * servers[num_servers];
-    servers[0] = "129.6.15.28";
-
-    ret = SNTP_getTime(servers, num_servers, &timeout, &curr_time);
+    ret = SNTP_getTime(NULL, 0, &timeout, &curr_time);
     if (ret == 0)
     {
         rtc_val_s = rtc_utc_to_mdt((curr_time >> 32) & 0xFFFFFFFF);
@@ -50,6 +53,24 @@ void rtc_update_time()
 void rtc_increment_time()
 {
     rtc_val_s++;
+
+    if (next_dispense.valid == true && rtc_val_s >= next_dispense.time)
+    {
+        rtc_dispense_info_t temp = next_dispense;
+
+        if (dispense_buffer.valid == true)
+        {
+            next_dispense = dispense_buffer;
+            dispense_buffer.valid = false;
+        }
+        else
+        {
+            next_dispense.valid = false;
+        }
+
+        temp.callback(temp.dispense_counts);
+    }
+
 }
 
 uint32_t rtc_get_time()
@@ -57,10 +78,24 @@ uint32_t rtc_get_time()
     return rtc_val_s;
 }
 
-void rtc_register_callback(uint32_t time, void (* callback)())
+void rtc_register_dispense(uint32_t time, void (* callback)(dispense_counts_t), dispense_counts_t dispense_counts)
 {
-    rtc_val_interrupt = time;
-    rtc_callback = callback;
+    if (next_dispense.valid == true && next_dispense.time != time)
+    {
+        dispense_buffer.valid = true;
+        dispense_buffer.time_registered = rtc_val_s;
+        dispense_buffer.time = time;
+        dispense_buffer.callback = callback;
+        dispense_buffer.dispense_counts = dispense_counts;
+    }
+    else
+    {
+        next_dispense.valid = true;
+        next_dispense.time_registered = rtc_val_s;
+        next_dispense.time = time;
+        next_dispense.callback = callback;
+        next_dispense.dispense_counts = dispense_counts;
+    }
 }
 
 uint32_t rtc_utc_to_mdt(uint32_t time)
@@ -75,5 +110,5 @@ uint32_t rtc_time_of_day(uint32_t time)
 
 uint32_t rtc_day(uint32_t time)
 {
-    return time / (24*60*60);
+    return time - rtc_time_of_day(time);
 }

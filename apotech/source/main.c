@@ -15,7 +15,7 @@
 #define _APP_THREAD(x) __APP_THREAD(x)
 #define APP_THREAD _APP_THREAD(APP_NAME)
 
-#define THREADSTACKSIZE (4096)
+#define THREADSTACKSIZE (8192)
 
 extern void * at_01_thread(void *arg0);
 extern void * at_02_thread(void *arg0);
