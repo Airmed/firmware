@@ -80,7 +80,7 @@ uint32_t rtc_get_time()
 
 void rtc_register_dispense(uint32_t time, void (* callback)(dispense_counts_t), dispense_counts_t dispense_counts)
 {
-    if (next_dispense.valid == true && next_dispense.time != time)
+    if (next_dispense.valid == true && next_dispense.time > time)
     {
         dispense_buffer.valid = true;
         dispense_buffer.time_registered = rtc_val_s;

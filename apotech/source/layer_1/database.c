@@ -121,6 +121,8 @@ void database_write_medication_qty(uint8_t med_id, uint8_t qty)
     free(response);
 }
 
+#define SECONDS_UNTIL_APR_1 (3763065600)
+
 void database_write_log(log_t log, bool notify)
 {
     char command[DATABASE_MAX_COMMAND_LEN];
@@ -128,8 +130,11 @@ void database_write_log(log_t log, bool notify)
     char timestamp_str[DATABASE_TIMESTAMP_LEN];
     char * response;
 
-    // TODO time handling
-//    sprintf(timestamp_str, "%04d-%02d-%02d %02d:%02d:%02d.000000", log.year, log.month, log.day, log.hour, log.minute, log.second);
+    uint8_t day = (log.time - SECONDS_UNTIL_APR_1) / (24 * 60 * 60) + 1;
+    uint8_t hour = (log.time % (24 * 60 * 60)) / (60 * 60);
+    uint8_t minute = (log.time % (60 * 60)) / 60;
+    uint8_t second = log.time % 60;
+    sprintf(timestamp_str, "%2019-04-%02d %02d:%02d:%02d.000000", day, hour, minute, second);
 
     switch (log.type)
     {
