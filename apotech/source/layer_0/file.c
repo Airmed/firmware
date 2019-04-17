@@ -68,40 +68,61 @@ void file_log_init()
     int32_t handle;
     SlFsFileInfo_t info;
 
-    if (sl_FsGetInfo((uint8_t *)log_file_name, 0, &info) != 0)
-    {
+    char temp[(sizeof(log_t) * MAX_NUM_LOGS) + 2];
+    memset(temp, 0, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
+
+//    if (sl_FsGetInfo((uint8_t *)log_file_name, 0, &info) != 0)
+//    {
         handle = sl_FsOpen((uint8_t *)log_file_name,
-                           SL_FS_CREATE | SL_FS_CREATE_MAX_SIZE( sizeof(log_t) * MAX_NUM_LOGS + 2 ),
+                           SL_FS_CREATE | SL_FS_OVERWRITE | SL_FS_CREATE_MAX_SIZE( (sizeof(log_t) * MAX_NUM_LOGS) + 2 ),
                            NULL);
+
+        int32_t ret = sl_FsWrite(handle, 0, (uint8_t *)&temp, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
         sl_FsClose(handle, NULL, NULL, 0);
-    }
+
+
+//    }
 }
 
 uint8_t file_log_read(log_t ** ptr_log_arr)
 {
     uint8_t log_count, last_read;
-    int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_READ, NULL);
-    sl_FsRead(handle, FILE_LOG_COUNT_LOC, (uint8_t *)&log_count, 1);
-    sl_FsRead(handle, FILE_LOG_LAST_READ_LOC, (uint8_t *)&last_read, 1);
+    char file[(sizeof(log_t) * MAX_NUM_LOGS) + 2];
+
+    int32_t handle = sl_FsOpen((uint8_t *)log_file_name, SL_FS_READ, NULL);
+    sl_FsRead(handle, FILE_LOG_COUNT_LOC, (uint8_t *)file, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
+
+    log_count = file[FILE_LOG_COUNT_LOC];
+    last_read = file[FILE_LOG_LAST_READ_LOC];
 
     uint8_t arr_len = log_count - last_read;
+    if (arr_len <= 0)
+    {
+        sl_FsClose(handle, NULL, NULL, 0);
+        return arr_len;
+    }
+
     *ptr_log_arr = (log_t *)malloc(arr_len * sizeof(log_t));
     if (*ptr_log_arr == NULL)
     {
         UART_PRINT("malloc failed");
+        sl_FsClose(handle, NULL, NULL, 0);
         return 0;
     }
 
     for (uint8_t i = 0; i < arr_len; i++)
     {
         log_t log;
-        sl_FsRead(handle, FILE_LOG_COUNT_LOC + (last_read + i + 1) * sizeof(log_t), (uint8_t *)&log, sizeof(log_t));
+        sl_FsRead(handle, FILE_LOG_LOC + (last_read + i) * sizeof(log_t), (uint8_t *)&log, sizeof(log_t));
         (*ptr_log_arr)[i] = log;
     }
 
     sl_FsClose(handle, NULL, NULL, 0);
+
+    file[FILE_LOG_LAST_READ_LOC] = log_count;
+
     handle = sl_FsOpen((uint8_t *)log_file_name, SL_FS_WRITE, NULL);
-    sl_FsWrite(handle, FILE_LOG_LAST_READ_LOC, (uint8_t *)&last_read, 1);
+    sl_FsWrite(handle, 0, (uint8_t *)file, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
     sl_FsClose(handle, NULL, NULL, 0);
 
     return arr_len;
@@ -110,14 +131,19 @@ uint8_t file_log_read(log_t ** ptr_log_arr)
 void file_log_write(log_t log)
 {
     uint8_t log_count;
-    int32_t handle = sl_FsOpen((uint8_t *)configuration_file_name, SL_FS_READ, NULL);
-    sl_FsRead(handle, FILE_LOG_COUNT_LOC, (uint8_t *)&log_count, 1);
+    int32_t handle = sl_FsOpen((uint8_t *)log_file_name, SL_FS_READ, NULL);
+
+    char file[(sizeof(log_t) * MAX_NUM_LOGS) + 2];
+
+    sl_FsRead(handle, 0, (uint8_t *)file, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
     sl_FsClose(handle, NULL, NULL, 0);
 
-    log_count++;
+    log_count = file[FILE_LOG_COUNT_LOC];
+    file[FILE_LOG_COUNT_LOC] = log_count + 1;
+
+    memcpy(&file[FILE_LOG_LOC + log_count * sizeof(log_t)], &log, sizeof(log_t));
 
     handle = sl_FsOpen((uint8_t *)log_file_name, SL_FS_WRITE, NULL);
-    sl_FsWrite(handle, FILE_LOG_COUNT_LOC, (uint8_t *)&log_count, 1);
-    sl_FsWrite(handle, FILE_LOG_LOC + log_count * sizeof(log_t), (uint8_t *)&log, sizeof(log_t));
+    sl_FsWrite(handle, 0, (uint8_t *)&file, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
     sl_FsClose(handle, NULL, NULL, 0);
 }

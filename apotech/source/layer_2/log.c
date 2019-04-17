@@ -31,5 +31,5 @@ void log_send_new()
         database_write_log(log_arr[i], log_arr[i].notify);
     }
 
-    free(log_arr);
+    if (log_count > 0) free(log_arr);
 }

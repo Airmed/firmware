@@ -18,8 +18,8 @@
 static const char str_query_medications[] = "{\"query\":\"SELECT * FROM medications;\"}";
 static const char str_update_medication_qty[] = "{\"query\":\"UPDATE medications SET qty=%d WHERE id=%d;\"}";
 static const char str_query_schedule[] = "{\"query\":\"SELECT * FROM schedule;\"}";
-static const char str_add_log[] = "{\"query\":\"INSERT INTO history (cur_time, error) VALUES (%lu, %s);\"}";
-static const char str_add_notification[] = "{\"query\":\"INSERT INTO notifications (cur_time, error) VALUES (%s, %s);\"}";
+static const char str_add_log[] = "{\"query\":\"INSERT INTO history (cur_time, error) VALUES ('%s', '%s');\"}";
+static const char str_add_notification[] = "{\"query\":\"INSERT INTO notifications (cur_time, error) VALUES ('%s', '%s');\"}";
 
 static const char str_medications_template[] = "{\"success\":boolean,\"data\":[{\"id\":uint32,\"name\":string,\"qty\":uint32}]}";
 static const char str_schedule_template[] = "{\"success\":boolean,\"data\":[{\"id\":uint32,\"med_id\":uint32,\"hour\":uint32,\"minute\":uint32,\"num_disp\":uint32}]}";
@@ -201,7 +201,7 @@ void database_write_log(log_t log, bool notify)
     uint8_t hour = (log.time % (24 * 60 * 60)) / (60 * 60);
     uint8_t minute = (log.time % (60 * 60)) / 60;
     uint8_t second = log.time % 60;
-    sprintf(timestamp_str, "%2019-04-%02d %02d:%02d:%02d.000000", day, hour, minute, second);
+    sprintf(timestamp_str, "2019-04-%02d %02d:%02d:%02d.000000", day, hour, minute, second);
 
     switch (log.type)
     {
@@ -214,9 +214,13 @@ void database_write_log(log_t log, bool notify)
         case DATABASE_LOG_TYPE_PILLS_TAKEN:
             strcpy(type_str, "Pills Taken");
             break;
+        default:
+            strcpy(type_str, "Unknown log type");
+            break;
     }
 
-    sprintf(command, str_add_log, log.time, type_str);
+    sprintf(command, str_add_log, timestamp_str, type_str);
+    UART_PRINT("\n\r%s\n\r\n\r", command);
 
     network_handle_t handle = network_server_connect(DATABASE_HOSTNAME);
     network_send_request(handle, command, &response);
@@ -227,6 +231,7 @@ void database_write_log(log_t log, bool notify)
     if (notify == true)
     {
         sprintf(command, str_add_notification, timestamp_str, type_str);
+        UART_PRINT("\n\r%s\n\r\n\r", command);
 
         network_handle_t handle = network_server_connect(DATABASE_HOSTNAME);
         network_send_request(handle, command, &response);
