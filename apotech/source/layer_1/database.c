@@ -4,7 +4,6 @@
 #include "data_types.h"
 #include "network.h"
 #include "uart_term.h"
-#include "file.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -22,18 +21,8 @@ static const char str_query_schedule[] = "{\"query\":\"SELECT * FROM schedule;\"
 static const char str_add_log[] = "{\"query\":\"INSERT INTO history (cur_time, error) VALUES (%lu, %s);\"}";
 static const char str_add_notification[] = "{\"query\":\"INSERT INTO notifications (cur_time, error) VALUES (%s, %s);\"}";
 
-Json_Handle templateHandle;
-Json_Handle jsonObjHandle;
-char* templateBuff;
-char* jsonBuffer;
-int16_t templateSize;
-uint16_t objSize;
-
-typedef struct
-{
-    uint32_t temp;
-} database_schedule_t;
-
+static const char str_medications_template[] = "{\"success\":boolean,\"data\":[{\"id\":uint32,\"name\":string,\"qty\":uint32}]}";
+static const char str_schedule_template[] = "{\"success\":boolean,\"data\":[{\"id\":uint32,\"med_id\":uint32,\"hour\":uint32,\"minute\":uint32,\"num_disp\":uint32}]}";
 
 typedef enum
 {
@@ -42,67 +31,145 @@ typedef enum
     DATABASE_LOG_TYPE_PILLS_TAKEN
 } database_log_type_t;
 
-typedef enum
+static void database_read_medications(configuration_t * ptr_configuration)
 {
-    INT32 = 0,
-    STRING_RAW = 1,
-    BOOLEAN = 2
-}json_value_t;
-
-int rows; /* Calculate number of rows in database */
-
-static uint8_t database_read_medications(database_medication_t ** ptr_medication_arr)
-{
-    uint32_t num_medications = 0;
     char * response;
 
     network_handle_t handle = network_server_connect(DATABASE_HOSTNAME);
     uint32_t response_len = network_send_request(handle, str_query_medications, &response);
     network_server_disconnect(handle);
 
-    UART_PRINT("%s\n\r", response);
-    parse_medication(response, ptr_medication_arr);
-    //*ptr_medication_arr =
+    if (response_len > 0)
+    {
+        for (uint32_t i = 1; i < strlen(response); i++)
+        {
+            if (response[i-1] == ']' && response[i] == '}')
+            {
+                response[i+1] = '\0';
+                break;
+            }
+        }
+        UART_PRINT("\n\r%s\n\r", response);
+
+        Json_Handle template_handle;
+        Json_Handle object_handle, object_bak;
+        bool success;
+        int32_t ret;
+
+        ret = Json_createTemplate(&template_handle, str_medications_template, strlen(str_medications_template));
+        ret |= Json_createObject(&object_handle, template_handle, 0);
+        ret |= Json_parse(object_handle, response, strlen(response));
+        object_bak = object_handle;
+
+        ret |= Json_getValue(object_handle, "\"success\"", &success, NULL);
+
+        if (success == true)
+        {
+            int32_t num_medications = Json_getArrayMembersCount(object_bak, "\"data\"");
+            for (uint8_t i = 0; i < num_medications && i < NUM_MEDICATIONS; i++)
+            {
+                uint32_t id;
+                char key[32];
+
+                sprintf(key, "\"data\"[%d]\"id\"", i);
+                ret = Json_getValue(object_bak, key, &id, NULL);
+                id--;
+
+                sprintf(key, "\"data\"[%d]\"name\"", i);
+                ret = Json_getValue(object_bak, key, ptr_configuration->medication[id].name, NULL);
+
+                sprintf(key, "\"data\"[%d]\"qty\"", i);
+                ret = Json_getValue(object_bak, key, &ptr_configuration->medication[id].count, NULL);
+            }
+        }
+
+        ret = Json_destroyObject(object_bak);
+        ret = Json_destroyTemplate(template_handle);
+    }
 
     free(response);
-
-    return num_medications;
 }
 
-static uint8_t database_read_schedule(database_schedule_t ** ptr_schedule_arr)
+static void database_read_schedule(configuration_t * ptr_configuration)
 {
-    uint32_t num_schedule = 0;
     char * response;
 
     network_handle_t handle = network_server_connect(DATABASE_HOSTNAME);
     uint32_t response_len = network_send_request(handle, str_query_schedule, &response);
     network_server_disconnect(handle);
 
-    // replace with parser
-    UART_PRINT("%s\n\r", response);
-    parse_schedule(response, ptr_schedule_arr);
-    //*ptr_schedule_arr =
+    if (response_len > 0)
+    {
+        for (uint32_t i = 1; i < strlen(response); i++)
+        {
+            if (response[i-1] == ']' && response[i] == '}')
+            {
+                response[i+1] = '\0';
+                break;
+            }
+        }
+        UART_PRINT("\n\r%s\n\r", response);
+
+        Json_Handle template_handle;
+        Json_Handle object_handle, object_bak;
+        bool success;
+        int32_t ret;
+
+        ret = Json_createTemplate(&template_handle, str_schedule_template, strlen(str_schedule_template));
+        ret |= Json_createObject(&object_handle, template_handle, 0);
+        ret |= Json_parse(object_handle, response, strlen(response));
+        object_bak = object_handle;
+
+        ret |= Json_getValue(object_handle, "\"success\"", &success, NULL);
+
+        if (success == true)
+        {
+            int32_t num_slots = Json_getArrayMembersCount(object_bak, "\"data\"");
+            for (uint8_t i = 0; i < num_slots; i++)
+            {
+                uint32_t id, idx = 0;
+                uint32_t hour, minute;
+                char key[32];
+
+                sprintf(key, "\"data\"[%d]\"med_id\"", i);
+                ret = Json_getValue(object_bak, key, &id, NULL);
+                id--;
+
+                dispense_slot_t * ptr_slot = &ptr_configuration->medication[id].dispense_slot[idx];
+                while (ptr_slot->valid == true)
+                {
+                    idx++;
+                    ptr_slot = &ptr_configuration->medication[id].dispense_slot[idx];
+                }
+                if (idx >= NUM_DISPENSE_SLOTS) continue;
+
+                ptr_slot->valid = true;
+
+                sprintf(key, "\"data\"[%d]\"hour\"", i);
+                ret = Json_getValue(object_bak, key, &hour, NULL);
+                sprintf(key, "\"data\"[%d]\"minute\"", i);
+                ret = Json_getValue(object_bak, key, &minute, NULL);
+                ptr_slot->time_of_day = (hour * 60 * 60) + (minute * 60);
+
+                sprintf(key, "\"data\"[%d]\"num_disp\"", i);
+                ret = Json_getValue(object_bak, key, &ptr_slot->count, NULL);
+            }
+        }
+
+        ret = Json_destroyObject(object_bak);
+        ret = Json_destroyTemplate(template_handle);
+    }
 
     free(response);
-
-    return num_schedule;
 }
 
 configuration_t database_read_configuration()
 {
-    database_medication_t * medication_arr;
-    database_schedule_t * schedue_arr;
-
-    uint8_t num_medications = database_read_medications(&medication_arr);
-    uint8_t num_schedule = database_read_schedule(&schedue_arr);
-
     configuration_t configuration;
     memset(&configuration, 0, sizeof(configuration_t));
 
-    // TODO translate
-
-//    free(medication_arr);
-//    free(schedue_arr);
+    database_read_medications(&configuration);
+    database_read_schedule(&configuration);
 
     return configuration;
 }
@@ -168,222 +235,3 @@ void database_write_log(log_t log, bool notify)
         free(response);
     }
 }
-
-
-//Zero out struct before parsing
-void parse_medication(char * response, database_medication_t **medicationPtr){
-    *medicationPtr = malloc(4*(sizeof(database_medication_t)));
-
-    char *template_medication = "{"
-                            "\"success\":boolean,"
-                            "\"data\":[{\"id\":int32,\"name\":string,\"qty\":int32}]}";
-    int16_t retVal;
-    uint16_t objSize = 1024;
-    char keyName[100];
-    char keyQty[100];
-    uint16_t valueSize = 100;
-    char getBuffer[100];
-    int32_t numValue;
-
-
-    retVal = Json_createTemplate(&templateHandle, template_medication, strlen(template_medication));
-    if(retVal < 0){
-        UART_PRINT("Error Creating Template");
-        while(1)
-                {
-                    ;
-                }
-    }
-    retVal = Json_createObject(&jsonObjHandle,templateHandle,objSize);
-    if(retVal < 0){
-            UART_PRINT("Error Creating Object");
-            while(1)
-                    {
-                        ;
-                    }
-        }
-
-   UART_PRINT("Response: %s", response);
-    retVal = Json_parse(jsonObjHandle, response, strlen(response));
-
-    if(retVal < 0){
-            UART_PRINT("Error Parsing Data");
-            while(1)
-                    {
-                        ;
-                    }
-        }
-
-
-        /* Parse Name */
-    rows = 0;
-    do {
-            memset(keyName,'\0',100);
-            memset(getBuffer,'\0',100);
-            sprintf(keyName, "\"data\".[%d].\"name\"", rows);
-            valueSize=100;
-            retVal = Json_getValue(jsonObjHandle,keyName,getBuffer,&valueSize);
-            //(*medicationPtr)[i].name = getBuffer;
-            UART_PRINT("\nName: %s \n\r",getBuffer);
-            rows++;
-       } while(strcmp (getBuffer,"") != 0);
-       /* Parse Quantity */
-
-       /* Parse Qty */
-       int i = 0;
-       int noData = 0;
-       int16_t Val = Json_getArrayMembersCount(jsonObjHandle, "\"data\".[0].\"qty\"");
-       int16_t checkVal = Val;
-           while(noData == 0){
-                 sprintf(keyQty, "\"data\".[%d].\"qty\"", i);
-                 valueSize=100;
-                 retVal = Json_getValue(jsonObjHandle,keyQty,&numValue,&valueSize);
-                 UART_PRINT("Qty: %d \n\r",numValue);
-                 i++;
-                 checkVal = Val;
-                 sprintf(keyQty, "\"data\".[%d].\"qty\"", i);
-                 int16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyQty);
-                 if(Val != checkVal) /* Check if data still available */
-                     noData = 1;
-                 //(*medicationPtr)[i].count = numValue;
-          }
-
-    retVal = Json_destroyTemplate(templateHandle);
-    retVal = Json_destroyObject(jsonObjHandle);
-
-}
-
-void parse_schedule(char * response, dispense_slot_t **medicationPtr){
-
-    char *template_schedule = "{"
-                         "\"success\":boolean,"
-                         "\"data\":[{\"id\":int32,\"med_id\":int32,\"hour\":int32,\"minute\":int32, \"num_disp\":int32}]}";
-
-    int16_t retVal;
-    uint16_t objSize = 1024;
-    char keyMedId[100];
-    char keyHour[100];
-    char keyMinute[100];
-    uint16_t valueSize = 100;
-    char getBuffer[100];
-    int32_t numValue;
-
-    retVal = Json_createTemplate(&templateHandle, template_schedule, strlen(template_schedule));
-    if(retVal < 0){
-        UART_PRINT("Error Creating Template");
-        while(1)
-                {
-                    ;
-                }
-    }
-    retVal = Json_createObject(&jsonObjHandle,templateHandle,objSize);
-    if(retVal < 0){
-            UART_PRINT("Error Creating Object");
-            while(1)
-                    {
-                        ;
-                    }
-        }
-
-    retVal = Json_parse(jsonObjHandle, response, strlen(response));
-
-    if(retVal < 0){
-            UART_PRINT("Error Parsing Data");
-            while(1)
-                    {
-                        ;
-                    }
-        }
-
-    /* Parse med_id */
-    int i = 0;
-    int noData = 0;
-    int16_t Val = Json_getArrayMembersCount(jsonObjHandle, "\"data\".[0].\"med_id\"");
-    int16_t checkVal = Val;
-        while(noData == 0){
-              sprintf(keyMedId, "\"data\".[%d].\"med_id\"", i);
-              valueSize=100;
-              retVal = Json_getValue(jsonObjHandle,keyMedId,&numValue,&valueSize);
-              UART_PRINT("Med_Id: %d \n\r",numValue);
-              i++;
-              checkVal = Val;
-              sprintf(keyMedId, "\"data\".[%d].\"med_id\"", i);
-              int16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyMedId);
-              if(Val != checkVal) /* Check if data still available */
-                  noData = 1;
-              //(*medicationPtr)[i].count = numValue;
-       }
-
-        /* Parse Hour*/
-        noData = 0;
-        i = 0;
-        Val = Json_getArrayMembersCount(jsonObjHandle, "\"data\".[0].\"hour\"");
-        checkVal = Val;
-        while(noData == 0){
-              sprintf(keyHour, "\"data\".[%d].\"hour\"", i);
-              valueSize=100;
-              retVal = Json_getValue(jsonObjHandle,keyHour,&numValue,&valueSize);
-              UART_PRINT("Hour: %d \n\r",numValue);
-              i++;
-              checkVal = Val;
-              sprintf(keyHour, "\"data\".[%d].\"hour\"", i);
-              int16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyHour);
-              if(Val != checkVal) /* Check if data still available */
-                  noData = 1;
-              //(*medicationPtr)[i].count = numValue;
-       }
-
-        /* Parse Minute */
-        noData = 0;
-        i = 0;
-        Val = Json_getArrayMembersCount(jsonObjHandle, "\"data\".[0].\"minute\"");
-        checkVal = Val;
-        while(noData == 0){
-              sprintf(keyMinute, "\"data\".[%d].\"minute\"", i);
-              valueSize=100;
-              retVal = Json_getValue(jsonObjHandle,keyMinute,&numValue,&valueSize);
-              UART_PRINT("Minute: %d \n\r",numValue);
-              i++;
-              checkVal = Val;
-              sprintf(keyMinute, "\"data\".[%d].\"minute\"", i);
-              int16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyMinute);
-              if(Val != checkVal) /* Check if data still available */
-                  noData = 1;
-              //(*medicationPtr)[i].count = numValue;
-       }
-        //getValue("\"data\".[%d].\"hour\"");
-
-    retVal = Json_destroyTemplate(templateHandle);
-    retVal = Json_destroyObject(jsonObjHandle);
-
-}
-
-#if 0 /* Wrote a function to parse but you need the integers anyways so whatever */
-void getValue(char* key){
-    int noData = 0;
-    int i = 0;
-    char *keyCopy[100];
-    uint16_t valueSize = 100;
-    char getBuffer[100];
-    int32_t numValue;
-    int16_t retVal;
-
-
-    sprintf(keyCopy, key, 0);
-    uint16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyCopy);
-    uint16_t checkVal = Val;
-    while(noData == 0){
-          sprintf(keyCopy, key, i);
-          valueSize=100;
-          retVal = Json_getValue(jsonObjHandle,keyCopy,&numValue,&valueSize);
-          i++;
-          checkVal = Val;
-          sprintf(keyCopy, key, i);
-          int16_t Val = Json_getArrayMembersCount(jsonObjHandle, keyCopy);
-          if(Val != checkVal) /* Check if data still available */
-              noData = 1;
-          //(*medicationPtr)[i].count = numValue;
-   }
-
-}
-#endif

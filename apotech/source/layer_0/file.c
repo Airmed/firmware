@@ -44,18 +44,18 @@ void file_configuration_write(configuration_t data)
 
 void file_configuration_print(configuration_t data)
 {
-    UART_PRINT("{\r\n");
+    UART_PRINT("\n\r{\n\r");
     for (uint8_t i = 0; i < NUM_MEDICATIONS; i++)
     {
         medication_t * ptr_medication = &data.medication[i];
         UART_PRINT("  {%s, %d, {", ptr_medication->name, ptr_medication->count);
         for (uint8_t j = 0; j < NUM_DISPENSE_SLOTS; j++)
         {
-            UART_PRINT(" {%d, %d, %d} ", ptr_medication->dispense_slot[j].time_of_day, ptr_medication->dispense_slot[j].count);
+            UART_PRINT(" {%d, %d, %d} ", ptr_medication->dispense_slot[j].valid, ptr_medication->dispense_slot[j].time_of_day, ptr_medication->dispense_slot[j].count);
         }
-        UART_PRINT("}\r\n");
+        UART_PRINT("}\n\r");
     }
-    UART_PRINT("}\r\n");
+    UART_PRINT("}\n\r\n\r");
 }
 
 #define MAX_NUM_LOGS (256)
