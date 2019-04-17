@@ -28,6 +28,7 @@ void schedule_next_dispense()
 //    configuration_t configuration = file_configuration_read();
 
     configuration_t configuration;
+#if 0
     configuration.medication[0].count = 20;
     configuration.medication[0].dispense_slot[0].valid = true;
     configuration.medication[0].dispense_slot[0].time_of_day = 20700;
@@ -68,7 +69,7 @@ void schedule_next_dispense()
     configuration.medication[3].dispense_slot[2].valid = false;
     configuration.medication[3].dispense_slot[2].time_of_day = 84600;
     configuration.medication[3].dispense_slot[2].count = 1;
-
+#endif
     uint32_t soonest_dispense_time = -1;
     uint32_t current_time = rtc_time_of_day(rtc_get_time());
     uint32_t current_day = rtc_day(rtc_get_time());
