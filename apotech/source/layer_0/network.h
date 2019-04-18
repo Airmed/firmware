@@ -5,17 +5,9 @@
 #include <ti/drivers/net/wifi/simplelink.h>
 #include <ti/net/http/httpclient.h>
 
-//#define NETWORK_SSID ("Craic Huset")
-//#define NETWORK_SECURITY (SL_WLAN_SEC_TYPE_WPA_WPA2)
-//#define NETWORK_PASSWORD ("kristinakelseysam")
-
 #define NETWORK_SSID ("Eagleton-2.4")
 #define NETWORK_SECURITY (SL_WLAN_SEC_TYPE_WPA_WPA2)
 #define NETWORK_PASSWORD ("inconc(EI)vable%d")
-
-//#define NETWORK_SSID ("UCB Wireless")
-//#define NETWORK_SECURITY (SL_WLAN_SEC_TYPE_OPEN)
-//#define NETWORK_PASSWORD ("")
 
 typedef HTTPClient_Handle network_handle_t;
 

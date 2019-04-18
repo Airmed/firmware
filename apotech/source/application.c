@@ -37,6 +37,11 @@ void * prod_thread(void * arg0)
             dispense();
         }
 
+        if (prev_events & EVENT_PILLS_TAKEN)
+        {
+            log_new(LOG_TYPE_PILLS_TAKEN);
+        }
+
         usleep(1000);
     }
 

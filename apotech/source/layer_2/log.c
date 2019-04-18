@@ -4,6 +4,7 @@
 #include "database.h"
 #include "file.h"
 #include "rtc.h"
+#include "uart_term.h"
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -25,6 +26,8 @@ void log_send_new()
 {
     log_t * log_arr;
     uint8_t log_count = file_log_read(&log_arr);
+
+    UART_PRINT("checking logs\n\r");
 
     for(uint8_t i = 0; i < log_count; i++)
     {

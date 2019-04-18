@@ -27,7 +27,6 @@ void * at_04_thread(void * arg0)
 
         if (prev_events & EVENT_UPDATE)
         {
-            UART_PRINT("checking logs\n\r");
             log_send_new();
         }
 

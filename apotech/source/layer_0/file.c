@@ -66,22 +66,16 @@ void file_configuration_print(configuration_t data)
 void file_log_init()
 {
     int32_t handle;
-    SlFsFileInfo_t info;
 
     char temp[(sizeof(log_t) * MAX_NUM_LOGS) + 2];
     memset(temp, 0, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
 
-//    if (sl_FsGetInfo((uint8_t *)log_file_name, 0, &info) != 0)
-//    {
-        handle = sl_FsOpen((uint8_t *)log_file_name,
-                           SL_FS_CREATE | SL_FS_OVERWRITE | SL_FS_CREATE_MAX_SIZE( (sizeof(log_t) * MAX_NUM_LOGS) + 2 ),
-                           NULL);
+    handle = sl_FsOpen((uint8_t *)log_file_name,
+                       SL_FS_CREATE | SL_FS_OVERWRITE | SL_FS_CREATE_MAX_SIZE( (sizeof(log_t) * MAX_NUM_LOGS) + 2 ),
+                       NULL);
 
-        int32_t ret = sl_FsWrite(handle, 0, (uint8_t *)&temp, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
-        sl_FsClose(handle, NULL, NULL, 0);
-
-
-//    }
+    sl_FsWrite(handle, 0, (uint8_t *)&temp, (sizeof(log_t) * MAX_NUM_LOGS) + 2);
+    sl_FsClose(handle, NULL, NULL, 0);
 }
 
 uint8_t file_log_read(log_t ** ptr_log_arr)
