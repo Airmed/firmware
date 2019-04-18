@@ -34,7 +34,9 @@ void * at_04_thread(void * arg0)
         if (prev_events & EVENT_DISPENSE)
         {
             UART_PRINT("log added\n\r");
+            log_new(LOG_TYPE_DISPENSE_SUCCESS);
             log_new(LOG_TYPE_DISPENSE_FAILED);
+            usleep(100000);
         }
 
         usleep(1000);
