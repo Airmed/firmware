@@ -17,15 +17,18 @@ stepper_t shutter_motor;
 
 xdc_Void shutter_count(xdc_UArg arg1);
 
+#define SENSOR_HIGH_THRESHOLD (1.5f)
+#define SENSOR_LOW_THRESHOLD (1.3f)
+
 void shutter_init()
 {
     sensor_high.pin = BOARD_SENSOR_HIGH;
     sensor_high.adc = BOARD_SENSOR_HIGH_ADC;
-    sensor_init(&sensor_high);
+    sensor_init(&sensor_high, SENSOR_HIGH_THRESHOLD);
 
     sensor_low.pin = BOARD_SENSOR_LOW;
     sensor_low.adc = BOARD_SENSOR_LOW_ADC;
-    sensor_init(&sensor_low);
+    sensor_init(&sensor_low, SENSOR_LOW_THRESHOLD);
 
     shutter_motor.position = 0;
     shutter_motor.position_target = 0;

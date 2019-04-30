@@ -16,7 +16,7 @@
 #define DATABASE_MAX_TYPE_STR_LEN (32)
 
 static const char str_query_medications[] = "{\"query\":\"SELECT * FROM medications;\"}";
-static const char str_update_medication_qty[] = "{\"query\":\"UPDATE medications SET qty=%d WHERE id=%d;\"}";
+static const char str_update_medication_qty[] = "{\"query\":\"UPDATE medications SET qty='%d' WHERE id='%d';\"}";
 static const char str_query_schedule[] = "{\"query\":\"SELECT * FROM schedule;\"}";
 static const char str_add_log[] = "{\"query\":\"INSERT INTO history (cur_time, error) VALUES ('%s', '%s');\"}";
 static const char str_add_notification[] = "{\"query\":\"INSERT INTO notifications (cur_time, error) VALUES ('%s', '%s');\"}";
@@ -180,6 +180,7 @@ void database_write_medication_qty(uint8_t med_id, uint8_t qty)
     char * response;
 
     sprintf(command, str_update_medication_qty, qty, med_id);
+    UART_PRINT("\n\r%s\n\r\n\r", command);
 
     network_handle_t handle = network_server_connect(DATABASE_HOSTNAME);
     network_send_request(handle, command, &response);

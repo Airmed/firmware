@@ -9,8 +9,8 @@
 #include <ti/sysbios/knl/Clock.h>
 #include <xdc/runtime/Error.h>
 
-#define STEPPER_DIR_CW (BOARD_PIN_ON)
-#define STEPPER_DIR_CCW (BOARD_PIN_OFF)
+#define STEPPER_DIR_CW (BOARD_PIN_OFF)
+#define STEPPER_DIR_CCW (BOARD_PIN_ON)
 
 xdc_Void stepper_handler(xdc_UArg arg1);
 

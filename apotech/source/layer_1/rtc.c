@@ -17,7 +17,6 @@ uint32_t rtc_val_interrupt = -1;
 void (* rtc_callback)() = NULL;
 
 static rtc_dispense_info_t next_dispense;
-static rtc_dispense_info_t dispense_buffer;
 
 void rtc_init()
 {
@@ -31,7 +30,6 @@ void rtc_init()
     Clock_create(rtc_increment_time, RTC_DELAY_MS, &clock_params, Error_IGNORE);
 
     next_dispense.valid = false;
-    dispense_buffer.valid = false;
 }
 
 void rtc_update_time()
@@ -56,19 +54,8 @@ void rtc_increment_time()
 
     if (next_dispense.valid == true && rtc_val_s >= next_dispense.time)
     {
-        rtc_dispense_info_t temp = next_dispense;
-
-        if (dispense_buffer.valid == true)
-        {
-            next_dispense = dispense_buffer;
-            dispense_buffer.valid = false;
-        }
-        else
-        {
-            next_dispense.valid = false;
-        }
-
-        temp.callback(temp.dispense_counts);
+        next_dispense.valid = false;
+        next_dispense.callback(next_dispense.dispense_counts);
     }
 
 }
@@ -80,15 +67,7 @@ uint32_t rtc_get_time()
 
 void rtc_register_dispense(uint32_t time, void (* callback)(dispense_counts_t), dispense_counts_t dispense_counts)
 {
-    if (next_dispense.valid == true && next_dispense.time > time)
-    {
-        dispense_buffer.valid = true;
-        dispense_buffer.time_registered = rtc_val_s;
-        dispense_buffer.time = time;
-        dispense_buffer.callback = callback;
-        dispense_buffer.dispense_counts = dispense_counts;
-    }
-    else
+    if (next_dispense.valid != true || next_dispense.time > time)
     {
         next_dispense.valid = true;
         next_dispense.time_registered = rtc_val_s;

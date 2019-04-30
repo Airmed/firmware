@@ -10,4 +10,7 @@ void led_status_on();
 void led_error_off();
 void led_error_on();
 
+void led_connection_off();
+void led_connection_on();
+
 #endif

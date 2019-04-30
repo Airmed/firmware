@@ -13,6 +13,8 @@ void * at_01_thread(void * arg0)
 {
     uint8_t pills_dispensed;
 
+    led_status_on();
+
     while (1)
     {
         for (uint8_t pill = 0; pill < PILLS_PER_HOPPER; pill++)
@@ -45,7 +47,7 @@ void * at_01_thread(void * arg0)
             }
         }
 
-        drum_next_hopper();
+//        drum_next_hopper();
     }
 
     return 0;

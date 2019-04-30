@@ -1,6 +1,7 @@
 
 #include "data_types.h"
 #include "events.h"
+#include "file.h"
 #include "hardware.h"
 #include "log.h"
 #include "schedule.h"
@@ -11,6 +12,7 @@
 
 uint32_t unhandled_events = 0;
 dispense_counts_t dispense_counts;
+button_interrupt_e button_interrupt = BUTTON_INTERRUPT_DISPENSE;
 
 void init_updates();
 void handle_updates();
@@ -30,6 +32,9 @@ void * prod_thread(void * arg0)
         {
             schedule_update();
             log_send_new();
+
+            configuration_t configuration = file_configuration_read();
+            file_configuration_print(configuration);
         }
 
         if (prev_events & EVENT_DISPENSE)
@@ -40,6 +45,18 @@ void * prod_thread(void * arg0)
         if (prev_events & EVENT_PILLS_TAKEN)
         {
             log_new(LOG_TYPE_PILLS_TAKEN);
+        }
+
+        if (prev_events & EVENT_SINGLE_DISPENSE)
+        {
+            dispense_counts_t temp;
+            temp.medication[0] = 2;
+            temp.medication[1] = 0;
+            temp.medication[2] = 1;
+            temp.medication[3] = 0;
+            dispense_counts = temp;
+
+            dispense();
         }
 
         usleep(1000);

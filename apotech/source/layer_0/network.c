@@ -1,6 +1,7 @@
 
 #include "network.h"
 
+#include "leds.h"
 #include "uart_term.h"
 
 #include <ti/drivers/net/wifi/simplelink.h>
@@ -168,11 +169,13 @@ void SimpleLinkWlanEventHandler(SlWlanEvent_t *pWlanEvent)
     {
         case SL_WLAN_EVENT_CONNECT:
             status = NETWORK_STATUS_CONNECTED;
+            led_connection_on();
             UART_PRINT("Connected\n\r");
             break;
 
         case SL_WLAN_EVENT_DISCONNECT:
             status = NETWORK_STATUS_DISCONNECTED;
+            led_connection_off();
             UART_PRINT("Disconnected\n\r");
             break;
 

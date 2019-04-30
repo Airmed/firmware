@@ -18,10 +18,13 @@
 
 extern dispense_counts_t dispense_counts;
 extern uint32_t unhandled_events;
+extern button_interrupt_e button_interrupt;
 
 void init_button_interrupts()
 {
+    button_interrupt = BUTTON_INTERRUPT_DISPENSE;
     GPIO_setCallback(BOARD_GPIO_BUTTON_PATIENT, patient_button_callback);
+    GPIO_enableInt(BOARD_GPIO_BUTTON_PATIENT);
 }
 
 #define BUZZER_FREQ (1000)
@@ -57,11 +60,6 @@ void dispense()
         }
     }
 
-    for (uint8_t medication_idx = 0; medication_idx < NUM_MEDICATIONS; medication_idx++)
-    {
-        database_write_medication_qty(medication_idx, configuration.medication[medication_idx].count);
-    }
-
     if (dispense_failed == true)
     {
         led_error_on();
@@ -71,16 +69,38 @@ void dispense()
     {
         led_status_on();
         buzzer_set_freq(BUZZER_FREQ);
-        GPIO_enableInt(BOARD_GPIO_BUTTON_PATIENT);
+        button_interrupt = BUTTON_INTERRUPT_SILENCE;
         log_new(LOG_TYPE_DISPENSE_SUCCESS);
     }
+
+    for (uint8_t medication_idx = 0; medication_idx < NUM_MEDICATIONS; medication_idx++)
+    {
+        database_write_medication_qty(medication_idx + 1, configuration.medication[medication_idx].count);
+    }
+
+    dispense_counts.data = 0;
 }
+
+#define BUTTON_DEBOUNCE_S (1)
 
 void patient_button_callback(uint_least8_t index)
 {
-    GPIO_disableInt(index);
-    led_status_off();
-    buzzer_off();
+    static uint32_t last_int = 0;
 
-    unhandled_events |= EVENT_PILLS_TAKEN;
+    if (rtc_get_time() < last_int + BUTTON_DEBOUNCE_S) return;
+
+    last_int = rtc_get_time();
+
+    if (button_interrupt == BUTTON_INTERRUPT_DISPENSE)
+    {
+        unhandled_events |= EVENT_SINGLE_DISPENSE;
+    }
+    else
+    {
+        led_status_off();
+        buzzer_off();
+        button_interrupt = BUTTON_INTERRUPT_DISPENSE;
+
+        unhandled_events |= EVENT_PILLS_TAKEN;
+    }
 }

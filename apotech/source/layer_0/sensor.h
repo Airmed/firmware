@@ -16,7 +16,7 @@ typedef struct
     ADC_Handle adc_handle;
 } sensor_t;
 
-void sensor_init(sensor_t * sensor);
+void sensor_init(sensor_t * sensor, float threshold);
 
 bool sensor_get_status(sensor_t * sensor);
 
